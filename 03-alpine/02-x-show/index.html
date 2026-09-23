@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Document</title>
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+</head>
+
+<body>
+    <div x-data="{visible: true}">
+        <!-- * every VARIABLE in js is true by default-->
+        <div x-show="visible==true">visible with true</div>
+        <div x-show="visible">just visible</div>
+        <button @click="visible = !visible">toggle</button>
+        <p x-text="visible"></p>
+    </div>
+</body>
+
+</html>
