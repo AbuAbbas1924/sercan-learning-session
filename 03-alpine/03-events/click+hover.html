@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div x-data="{variable: 'Musa', count: 0, leave: false}">
+        <p>Salamulaikum <span x-text="variable"></span></p>
+        <p x-text="`my counter is ${count}`"></p>
+        <button @click="count += 1; leave=false">click button</button>
+        <button
+            @mouseenter="leave=false; count += 1"
+            @mouseleave="leave=true"
+        >hover button</button>
+        <p x-show="leave">du hast dein buttonfeld verlassen</p>
+        </diccf </body>
+
+</html>
