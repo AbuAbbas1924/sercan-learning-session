@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div x-data="{ count: 0 }">
+        <p x-text="`my counter is ${count}`"></p>
+        <button @click="count++">++</button>
+        <button @click="count += 1">+1</button>
+        <br>
+        <button @click="count+=2">+2</button>
+        <br>
+        <button @click="count+=3">+3</button>
+    </div>
+</body>
+
+</html>
