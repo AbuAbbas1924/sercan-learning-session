@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div x-data="{ count: 0, leave: false }">
+        <p x-text="`my counter is ${count}`"></p>
+        <button
+            @mouseover="count++; leave=false"
+            @mouseleave="leave=true"
+        >added by hover</button>
+        <p x-show="leave">you left</p>
+    </div>
+</body>
+
+</html>
