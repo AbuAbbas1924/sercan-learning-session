@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div
+        x-data="{ count: 0, pressed: false }"
+        x-init="console.log('initialization of alpine')"
+    >
+        <p x-text="`my counter is ${count}`"></p>
+        <button @keydown.ctrl="console.log('ctrl clicked')">needs ctrl, local event</button>
+        <button @keydown.shift.window="console.log('ctrl clicked')">needs shift, global event</button>
+    </div>
+</body>
+
+</html>
