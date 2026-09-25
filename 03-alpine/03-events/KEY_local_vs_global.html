@@ -20,9 +20,20 @@
         x-init="console.log('initialization of alpine')"
     >
         <p x-text="`my counter is ${count}`"></p>
-        <button @keydown.ctrl="console.log('ctrl clicked')">needs ctrl, local event</button>
-        <button @keydown.shift.window="console.log('ctrl clicked')">needs shift, global event</button>
+        <button @keydown.ctrl="console.log('ctrl clicked'); count++">local event: focused + type ctrl</button>
+        <button @keydown.shift..window="console.log('shift clicked'); count--">global event: without focus + type shift
+        </button>
     </div>
+    <hr>
+    <div x-data>
+        <button
+            type="button"
+            @keydown.ctrl.shift.k="console.log('Ctrl + Shift + K pressed')"
+        >
+            globalEvent: Press Ctrl + Shift + K
+        </button>
+    </div>
+
 </body>
 
 </html>

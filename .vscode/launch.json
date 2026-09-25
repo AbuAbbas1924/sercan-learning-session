@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "http://127.0.0.1:3002/03-alpine/03-events/KEY_local_vs_global.html",
+            "request": "launch",
+            "url": "http://127.0.0.1:3002/03-alpine/03-events/KEY_local_vs_global.html"
+        }
+    ]
+}
