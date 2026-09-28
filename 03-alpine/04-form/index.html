@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Document</title>
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+</head>
+
+<body>
+    <form
+        x-data="loadingData()"
+        @submit.prevent="sending()"
+    >
+        <input
+            type="text"
+            x-model="username"
+        >
+        <input
+            type="text"
+            x-model="password"
+        >
+        <button type="submit">submit</button>
+        <hr>
+        <span x-text="`username: ${username} | password: ${password}`"></span>
+    </form>
+</body>
+<script>
+    function loadingData() {
+        return {
+            username: '',
+            password: '',
+            sending() {
+                return console.log(`username: ${this.username} & password: ${this.password}`)
+            }
+        }
+    }
+</script>
+
+</html>
