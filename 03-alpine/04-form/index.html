@@ -12,7 +12,7 @@
         src="https://unpkg.com/alpinejs"
         defer
     ></script>
-    <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
@@ -22,15 +22,24 @@
     >
         <input
             type="text"
+            class="p-2 border-2 border-gray-300 rounded"
             x-model="username"
         >
         <input
             type="text"
+            class="p-2 border-2 border-gray-300 rounded"
             x-model="password"
         >
-        <button type="submit">submit</button>
-        <hr>
-        <span x-text="`username: ${username.length} | password: ${password.length}`"></span>
+        <button
+            type="submit"
+            :class="condition ?  'bg-green-500 px-5 py-2 rounded-xl text-white cursor-pointer' : 'bg-green-300 cursor-not-allowed px-5 py-2 rounded-xl text-white'"
+        >submit</button>
+        <hr class="my-5">
+        <!-- <span x-text="`username: ${username.length} | password: ${password.length}`"></span> -->
+        <span
+            x-text="getMessage()"
+            x-bind:class="{'text-green-500': condition, 'text-red-500': !condition}"
+        ></span>
     </form>
 </body>
 <script>
@@ -38,8 +47,15 @@
         return {
             username: '',
             password: '',
+            message: '',
+            get condition() {
+                return this.username.length > 0 && this.password.length > 0
+            },
+            getMessage() {
+                if (this.condition) { return `condition fulfilled`; } else { return `condition not fulfilled`; }
+            },
             sending() {
-                if (this.username.length > 0 && this.password.length > 0) {
+                if (this.condition) {
                     return console.log(`sending username: ${this.username} | password: ${this.password}`)
                 }
             }
