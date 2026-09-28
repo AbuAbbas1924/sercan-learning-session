@@ -30,7 +30,7 @@
         >
         <button type="submit">submit</button>
         <hr>
-        <span x-text="`username: ${username} | password: ${password}`"></span>
+        <span x-text="`username: ${username.length} | password: ${password.length}`"></span>
     </form>
 </body>
 <script>
@@ -39,7 +39,9 @@
             username: '',
             password: '',
             sending() {
-                return console.log(`username: ${this.username} & password: ${this.password}`)
+                if (this.username.length > 0 && this.password.length > 0) {
+                    return console.log(`sending username: ${this.username} | password: ${this.password}`)
+                }
             }
         }
     }
