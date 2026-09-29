@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>02-function-grundlagen</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <div x-data="{ text: 'noch nicht geklickt' }">
+      <p x-text="text"></p>
+
+      <button @click="text = 'Hallo!'">Klicken</button>
+    </div>
+    <hr />
+    <div
+      x-data="{
+    text: 'Noch nicht geklickt',
+
+    begruessen() {
+        this.text = 'Hallo!';
+    }
+}"
+    >
+      <p x-text="text"></p>
+      <button type="button" @click="begruessen()">Klicken</button>
+    </div>
+
+    <!-- Deine Aufgabe:
+1. Erstelle das HTML-Grundgerüst und binde Alpine wie bisher ein.
+2. Lege in x-data einen Wert nachricht mit dem Anfangstext „Ich lerne Funktionen“ an.
+3. Schreibe eine Funktion zeigeNachricht(), die diesen Wert auf „Meine Funktion funktioniert!“ ändert.
+4. Zeige nachricht mit x-text an.
+5. Rufe deine Funktion über einen Button auf.
+
+Als kleine Erweiterung: Ergänze im letzten Bereich eine zweite Funktion zuruecksetzen() und einen zweiten Button. Beim Klicken soll wieder „Ich lerne Funktionen“ erscheinen.
+Tipp: Die beiden Funktionen müssen innerhalb von x-data durch ein Komma getrennt werden: -->
+
+    <div
+      x-data="{ 
+    text: 'Ich lerne Funktionen',
+
+    zeigeNachricht() {
+        this.text = 'Meine Funktion funktioniert!'
+    }, 
+    zuruecksetzen() {
+        this.text ='Ich lerne Funktionen'
+    }
+}"
+    >
+      <p x-text="text"></p>
+      <button type="button" @click="zeigeNachricht()">Test</button>
+      <button type="button" @click="zuruecksetzen()">Reset</button>
+    </div>
+  </body>
+</html>
