@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Document</title>
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div
+        x-data="ourData()"
+        class="space-y-4 m-4"
+    >
+        <div
+            class="px-4 py-2 rounded-xl w-fit cursor-pointer"
+            :class="dark1? 'bg-red-600 mx-auto text-white italic': 'bg-red-300 text-red-600'"
+            @click="dark1=!dark1"
+        >switch dark</div>
+        <div
+            class="flex px-4 py-2 rounded-xl cursor-pointer"
+            :class="dark2? 'bg-blue-600 text-white block h-20 text-center': 'bg-blue-300 text-blue-600 w-fit'"
+            @click="dark2=!dark2"
+        >
+            <p :class="dark2? 'text-white m-auto font-bold underline': ''">switch dark</p>
+        </div>
+        <div
+            class="px-4 py-2 rounded-xl w-fit cursor-pointer"
+            :class="dark3? 'bg-green-900 text-white border-4 ring-4 outline-4 outline-offset-4 outline-green-300 ring-green-500 border-green-700': 'bg-green-300 text-green-600'"
+            @click="dark3=!dark3"
+        >switch dark</div>
+    </div>
+</body>
+<script>
+    function ourData() {
+        return {
+            dark1: false,
+            dark2: false,
+            dark3: false,
+        }
+    }
+</script>
+
+</html>
