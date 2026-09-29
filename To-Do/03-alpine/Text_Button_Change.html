@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine-Buttons</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+</head>
+<body>
+    <div x-data="{text: 'Hallo', change:true}">
+        <p x-text="text"></p>
+        <button @click="text = 'Salamu Aleikum'" >Islamisch</button>
+    </div>
+    
+    <br>
+    
+    <div x-data="{text: 'Salamu Aleikum', change: true}">
+        <p x-text="text"></p>
+        <button @click="text = 'Wa Aleikum' ">Antworte</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Math</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+</head>
+<body>
+    <div x-data="{zahl: 10}">
+        <p x-text="zahl"></p>
+        <button @click="zahl +=2">+2</button>
+        <br>
+        <button @click="zahl -=2">-2</button>
+        <br>
+        <button @click="zahl *=2">*2</button>
+        <br>
+        <button @click="zahl /=2">/2</button>
+    </div>
+</body>
+</html>
