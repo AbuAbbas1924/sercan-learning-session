@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>form-grundlagen</title>
+  </head>
+  <body>
+    <!--Baue zunächst mit HTML ein Formular mit:
+1. Der Überschrift „Meine Anmeldung“.
+2. Einem beschrifteten Pflichtfeld für den Benutzernamen.
+3. Einem beschrifteten Pflichtfeld für das Passwort, dessen Zeichen verdeckt erscheinen.
+4. Einem Button mit dem Text „Anmelden“. -->
+
+    <h1>Meine Anmeldung</h1>
+    <form action="./02-function-grundlagen.html">
+      <label for="Benutzername">Benutzername</label>
+      <input type="text" id="Benutzername" name="Benutzername" required />
+      <br />
+      <label for="Passwort">Passwort</label>
+      <input type="password" id="Passwort" name="Passwort " required />
+      <br />
+
+      <button type="submit">Anmelden</button>
+    </form>
+  </body>
+</html>
