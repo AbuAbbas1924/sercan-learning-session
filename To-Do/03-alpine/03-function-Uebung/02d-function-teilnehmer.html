@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>02-function-grundlagen</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <!--Deine Aufgabe:
+1. Lege in x-data den Wert teilnehmer: 0 an.
+2. Zeige die aktuelle Teilnehmerzahl mit x-text an.
+3. Erstelle drei Funktionen und passende Buttons:
+hinzufuegen()	„Teilnehmer +1“	Erhöht die Zahl, aber höchstens bis 5.
+entfernen()	„Teilnehmer −1“	Verringert die Zahl, aber niemals unter 0.
+zuruecksetzen()	„Reset“	Setzt die Zahl auf 0.  -->
+    <h1>Teilnehmerzähler für einen Workshop</h1>
+
+    <div
+      x-data="{ teilnehmer: 0, 
+        hinzufuegen() { 
+            if ( this.teilnehmer < 5) {
+                this.teilnehmer += 1}    
+        }, 
+        entfernen() {
+            if (this.teilnehmer > 0) { 
+                this.teilnehmer -=1}
+        },
+        zuruecksetzen() {this.teilnehmer = 0},
+     }"
+    >
+      <p x-text="teilnehmer"></p>
+      <button type="button" @click="hinzufuegen()">Teilnehmer +1</button>
+      <button type="button" @click="entfernen()">Teilnehmer -1</button>
+      <button type="button" @click="zuruecksetzen()">Reset</button>
+    </div>
+  </body>
+</html>
