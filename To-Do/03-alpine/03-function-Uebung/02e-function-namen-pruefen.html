@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Namen-Pruefen</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <!-- Deine Aufgabe: Namen prüfen
+1. Lege in x-data zwei Werte an:
+   - benutzername: zunächst leer.
+   - nachricht: zunächst „Bitte gib einen Namen ein.“
+2. Verbinde ein beschriftetes Eingabefeld über x-model mit benutzername.
+3. Schreibe eine Funktion pruefen():
+   - Hat der Name mindestens 3 Zeichen, setze die Nachricht auf „Hallo, [Name]!“.
+   - Andernfalls soll „Der Name muss mindestens 3 Zeichen haben.“ erscheinen.
+4. Erstelle einen Button „Prüfen“, der die Funktion aufruft.
+5. Zeige die Nachricht mit x-text an.
+6. Ergänze eine Funktion zuruecksetzen() mit passendem Button: Sie soll das Eingabefeld leeren und die Anfangsnachricht wiederherstellen.  -->
+
+    <div
+      x-data="{ benutzername: '', 
+    nachricht: 'Bitte gebe einen Namen ein.',
+    pruefen() { if (this.benutzername.length >= 3) {
+        this.nachricht = 'Hallo, ' + this.benutzername + '!'
+    } else {
+        this.nachricht = 'Der Name muss mindestens 3 Zeichen haben.'
+    } }, 
+    reset() {this.benutzername = ''
+     this.nachricht = 'Bitte gib einen Namen ein.'}
+
+    } 
+    "
+    >
+      <label for="benutzername">Benutzername:</label>
+      <input type="text" x-model="benutzername" />
+      <p x-text="nachricht"></p>
+      <button type="button" @click="pruefen()">Pruefen</button>
+      <button type="button" @click="reset()">Reset</button>
+    </div>
+  </body>
+</html>
