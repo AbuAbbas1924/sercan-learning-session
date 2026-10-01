@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <form action="" x-data="LoginData">
+      <h1>Login</h1>
+      <input x-model="email" type="email" placeholder="email" name="email" required />
+      <input x-model="password" type="password" placeholder="password" name="password" required />
+      <button type="submit">Login</button>
+      <p x-text="login()"></p>
+      <div x-text="email.length"></div>
+      <div x-text="email"></div>
+      <div x-text="password.length"></div>
+      <div x-text="password"></div>
+    </form>
+
+    <script>
+          function LoginData() {
+              return {
+          email: '',
+          password: '',
+          nachricht: 'You are logged in',
+          login() { if(this.email.length > 1 && this.password.length > 1) {
+            return this.nachricht
+          } }
+      }
+          }
+    </script>
+  </body>
+</html>
