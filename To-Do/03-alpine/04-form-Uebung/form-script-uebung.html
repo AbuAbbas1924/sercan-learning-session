@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <form action="" x-data="LoginData" @submit.prevent="logincheck()">
+      <h1>Login</h1>
+      <fieldset>
+        <input
+          type="text"
+          x-model="username"
+          name="username"
+          placeholder="username"
+        />
+        <input
+          type="password"
+          x-model="password"
+          name="password"
+          placeholder="password"
+        />
+
+        <p x-text="nachricht"></p>
+        <button type="submit">Login</button>
+      </fieldset>
+    </form>
+
+    <script>
+      function LoginData() {
+        return {
+          username: "",
+          password: "",
+          nachricht: "Please Login",
+          logincheck() {
+            if (this.username.length < 3 || this.password.length < 3) {
+              this.nachricht =
+                "Your username and password must be atleast 3 figures big";
+            } else {
+              this.nachricht = "Login succesful";
+            }
+          },
+        };
+      }
+    </script>
+
+    <form action="" x-data="PasswortData()" @submit.prevent="Passwortabfrage()">
+      <fieldset>
+        <h1>Passwortabfrage:</h1>
+        <input
+          type="password"
+          x-model="Passwort"
+          name="Passwort"
+          placeholder="Passwort"
+        />
+        <br />
+        <input
+          type="password"
+          x-model="Passwort2"
+          name="Passwort2"
+          placeholder="Passwort wiederholen"
+        />
+        <br />
+
+        <button type="submit">Passwort bestaetigen</button>
+
+        <p x-text="message"></p>
+      </fieldset>
+    </form>
+
+    <script>
+      function PasswortData() {
+        return {
+          Passwort: "",
+          Passwort2: "",
+          message: "Bitte bestaetigen Sie ihr Passwort",
+          Passwortabfrage() {
+            if (
+              this.Passwort !== this.Passwort2 ||
+              this.Passwort.length < 4 ||
+              this.Passwort2.length < 4
+            ) {
+              this.message =
+                "Die Passwoerter muessen uebereinstimmen und das Passwort muss mindestens vier Zeichen lang sein";
+            } else {
+              this.message = "Passwort erfolgreich bestaetigt.";
+            }
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
