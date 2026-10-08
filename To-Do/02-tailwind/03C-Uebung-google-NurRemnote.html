@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Google – nur mit Remnote</title>
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x" defer></script>
+  </head>
+
+  <!--
+    font-sans: Schrift ohne Serifen.
+    text-sm: kleine Schrift.
+    text-gray-800: dunkelgraue Schrift.
+    bg-white: weißer Hintergrund.
+
+    x-data: startet unseren Alpine-Bereich.
+  -->
+  <body
+    class="bg-white font-sans text-sm text-gray-800"
+    x-data="googleDaten()"
+  >
+    <!-- OBERER BEREICH -->
+
+    <!-- text-right richtet die Links innerhalb dieses Bereichs rechts aus. -->
+    <div class="p-4 text-right">
+      <a href="https://mail.google.com/" class="mr-4">
+        Gmail
+      </a>
+
+      <a href="https://images.google.com/" class="mr-4">
+        Bilder
+      </a>
+
+      <a
+        href="https://accounts.google.com/"
+        class="rounded-full bg-blue-600 px-6 py-3 text-white"
+      >
+        Anmelden
+      </a>
+    </div>
+
+    <!-- HAUPTBEREICH -->
+
+    <!--
+      mt-24: Außenabstand nach oben.
+      px-4: Innenabstand links und rechts.
+      text-center: Text und Inline-Inhalte mittig ausrichten.
+    -->
+    <div class="mt-24 px-4 text-center">
+      <!--
+        Jeder Buchstabe bekommt eine eigene Textfarbe.
+        tracking-tighter verringert den Zeichenabstand.
+
+        Die span-Elemente stehen ohne Leerzeichen nebeneinander,
+        damit zwischen den Buchstaben keine zusätzlichen Lücken entstehen.
+      -->
+      <h1 class="mb-8 text-8xl font-medium tracking-tighter">
+        <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-600">l</span><span class="text-red-500">e</span>
+      </h1>
+
+      <!--
+        label und for verbinden die Beschriftung mit dem Eingabefeld.
+        for und id müssen dafür denselben Wert haben.
+      -->
+      <div class="mb-3">
+        <label for="suchfeld">Suchbegriff eingeben</label>
+      </div>
+
+      <!--
+        x-model verbindet das Eingabefeld mit unserer Variable suchbegriff.
+
+        w-2/3: zwei Drittel der Breite des übergeordneten Bereichs.
+        rounded-full: vollständig abgerundete Ecken.
+        border: Rahmen mit 1px Dicke.
+        px-5 und py-3: Innenabstände.
+      -->
+      <input
+        id="suchfeld"
+        type="text"
+        name="q"
+        x-model="suchbegriff"
+        class="w-2/3 rounded-full border border-gray-300 px-5 py-3 text-base"
+      />
+
+      <!-- BUTTONS -->
+
+      <div class="mt-7">
+        <!-- @click ruft die Funktion suchen() auf. -->
+        <button
+          type="button"
+          @click="suchen()"
+          class="mr-2 rounded-sm bg-gray-100 px-4 py-2"
+        >
+          Google Suche
+        </button>
+
+        <button
+          type="button"
+          @click="aufGutGlueck()"
+          class="rounded-sm bg-gray-100 px-4 py-2"
+        >
+          Auf gut Glück!
+        </button>
+      </div>
+
+      <!-- x-text zeigt den aktuellen Inhalt von nachricht an. -->
+      <p
+        x-text="nachricht"
+        class="mt-6 text-gray-600"
+      ></p>
+    </div>
+
+    <!-- UNTERER BEREICH -->
+
+    <!--
+      mt-32 erzeugt einen festen Abstand zum Hauptbereich.
+      Dieser Bereich ist deshalb nicht automatisch am Fensterrand unten.
+    -->
+    <div class="mt-32 bg-gray-100">
+      <div class="border-b border-gray-300 px-6 py-4">
+        Deutschland
+      </div>
+
+      <div class="px-6 py-4 text-center">
+        <a href="https://about.google/" class="mx-3">
+          Über Google
+        </a>
+
+        <a href="https://ads.google.com/" class="mx-3">
+          Werbeprogramme
+        </a>
+
+        <a href="https://policies.google.com/privacy" class="mx-3">
+          Datenschutz
+        </a>
+
+        <a href="https://policies.google.com/terms" class="mx-3">
+          Nutzungsbedingungen
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // Wie bei deinen Formularübungen:
+      // Die Funktion liefert die Daten und Funktionen für x-data.
+      function googleDaten() {
+        return {
+          suchbegriff: '',
+          nachricht: '',
+
+          suchen() {
+            // this greift auf unsere Alpine-Daten zu.
+            // Das + verbindet den Text mit dem eingegebenen Suchbegriff.
+            this.nachricht = 'Dein Suchbegriff: ' + this.suchbegriff;
+          },
+
+          aufGutGlueck() {
+            this.nachricht = 'Hier würde Google einen Treffer direkt öffnen.';
+          }
+        };
+      }
+    </script>
+  </body>
+</html>

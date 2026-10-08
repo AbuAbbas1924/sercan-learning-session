@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email-Adresse-bestaetigen</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <form action="" x-data="EMailData()" @submit.prevent="EMailP()">
+      <h1>Steam verify</h1>
+
+      <input type="text" x-model="Email1" name="Email1" placeholder="E-Mail" />
+      <br />
+      <input
+        type="text"
+        x-model="Email2"
+        name="Email2"
+        placeholder="E-Mail erneut eingeben"
+      />
+      <br />
+      <button type="submit">E-Mail bestaetigen</button>
+      <br />
+      <button type="button" @click="reset()">Reset</button>
+      <br />
+      <p x-text="nachricht"></p>
+    </form>
+
+    <script>
+      function EMailData() {
+        return {
+          Email1: "",
+          Email2: "",
+          nachricht: "Bitte bestaetigen Sie ihre E-Mail",
+
+          EMailP() {
+            if (this.Email1 !== this.Email2) {
+              this.nachricht = "Die E-Mail ist nicht identisch";
+            } else if (this.Email1.length < 4 || this.Email2.length < 4) {
+              this.nachricht = "E-Mail muss mindestens 4 Zeichen enthalten";
+            } else if (
+              !this.Email1.includes("@") ||
+              !this.Email2.includes("@")
+            ) {
+              this.nachricht = "Die E-Mail Email-Adresse muss ein @ enthalten";
+            } else {
+              this.nachricht = "E-Mail erfolgreich bestaetigt";
+            }
+          },
+
+          reset() {
+            this.Email1 = "";
+            this.Email2 = "";
+            this.nachricht = "Bitte bestaetigen Sie ihre E-Mail";
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

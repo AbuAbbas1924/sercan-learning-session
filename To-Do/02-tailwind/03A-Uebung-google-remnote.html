@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Google – RemNote-Übung</title>
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x" defer></script>
+
+    <!--
+      NEU: x-cloak verhindert, dass ausgeblendete Alpine-Inhalte
+      beim Laden der Seite kurz sichtbar werden.
+
+      Diese CSS-Regel versteckt Elemente mit dem Attribut x-cloak.
+      Sobald Alpine bereit ist, entfernt es dieses Attribut.
+    -->
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <!--
+    NEU: flex aktiviert Flexbox für die direkten Kindelemente.
+    Normalerweise stehen diese damit nebeneinander.
+
+    flex-col  → ordnet die Kindelemente untereinander an.
+    min-h-screen → Seite mindestens so hoch wie das Browserfenster.
+
+    Dadurch können Kopfbereich, Hauptbereich und Fußbereich
+    untereinander die gesamte Fensterhöhe ausfüllen.
+  -->
+  <body
+    class="flex flex-col bg-white min-h-screen font-sans text-gray-800 text-sm"
+    x-data="{ einstellungenOffen: false }"
+  >
+    <!--
+      NEU: header ist der Kopfbereich einer Seite.
+
+      justify-between → verteilt die Kinder mit Platz dazwischen.
+      items-center    → richtet sie hier senkrecht mittig aus.
+      flex-wrap       → erlaubt bei Platzmangel einen Zeilenumbruch.
+      gap-4           → Abstand zwischen den Kindelementen.
+    -->
+    <header class="flex flex-wrap justify-between items-center gap-4 p-4">
+      <div class="flex items-center gap-4">
+        <!--
+          NEU: hover:underline
+          Die Unterstreichung erscheint nur beim Darüberfahren
+          mit der Maus. Dafür wird kein Alpine benötigt.
+        -->
+        <a href="https://about.google/" class="hover:underline">
+          Über Google
+        </a>
+
+        <a href="https://store.google.com/" class="hover:underline">
+          Store
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="https://mail.google.com/" class="hover:underline">
+          Gmail
+        </a>
+
+        <a href="https://images.google.com/" class="hover:underline">
+          Bilder
+        </a>
+
+        <!--
+          NEU: aria-label gibt einem Element einen Namen,
+          den Vorleseprogramme verwenden können.
+
+          hover:bg-gray-100 → hellgrauer Hintergrund bei Mausberührung.
+        -->
+        <a
+          href="https://about.google/products/"
+          aria-label="Google-Produkte"
+          class="hover:bg-gray-100 p-2 rounded-full"
+        >
+          <!--
+            NEU: SVG ist eine Grafik aus Formen und Zeichenanweisungen.
+            Sie bleibt auch beim Vergrößern scharf.
+
+            viewBox="0 0 24 24" → internes Koordinatensystem.
+            fill="currentColor" → Füllfarbe folgt der Textfarbe.
+            aria-hidden="true" → Grafik vor Vorleseprogrammen verstecken;
+                                 der Link hat bereits einen Namen.
+
+            circle → Kreis.
+            cx / cy → Position seines Mittelpunkts.
+            r → Radius.
+
+            Die neun Kreise ergeben das Google-Apps-Symbol.
+          -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+            class="w-6 h-6 text-gray-600"
+          >
+            <circle cx="5" cy="5" r="2" />
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="19" cy="5" r="2" />
+            <circle cx="5" cy="12" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="19" cy="12" r="2" />
+            <circle cx="5" cy="19" r="2" />
+            <circle cx="12" cy="19" r="2" />
+            <circle cx="19" cy="19" r="2" />
+          </svg>
+        </a>
+
+        <a
+          href="https://accounts.google.com/"
+          class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-full text-white"
+        >
+          Anmelden
+        </a>
+      </div>
+    </header>
+
+    <!--
+      NEU: main enthält den Hauptinhalt der Seite.
+
+      flex-1 → nimmt innerhalb unseres flex-col-Bodys den freien Platz ein.
+      Dadurch steht der Footer bei wenig Inhalt am unteren Fensterrand.
+
+      items-center → zentriert die Kinder bei flex-col horizontal.
+    -->
+    <main class="flex flex-col flex-1 items-center px-4 pt-20 pb-12">
+      <!--
+        Der Schriftzug ist bewusst aus Text aufgebaut.
+        Die Buchstaben sind span-Elemente: einzelne Textbereiche.
+
+        Keine Leerzeichen zwischen den span-Elementen:
+        Sonst könnten sichtbare Lücken im Wort entstehen.
+      -->
+      <h1 class="mb-8 font-medium text-8xl tracking-tighter">
+        <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-600">l</span><span class="text-red-500">e</span>
+      </h1>
+
+      <!--
+        NEU: method="get" hängt Formulardaten an die Zieladresse an.
+        Google erwartet den Suchbegriff unter dem Namen q.
+
+        Beispiel: https://www.google.com/search?q=Tailwind
+
+        NEU: max-w-xl begrenzt die maximale Breite.
+        w-full lässt das Formular auf kleinen Bildschirmen schmaler werden.
+      -->
+      <form
+        action="https://www.google.com/search"
+        method="get"
+        class="w-full max-w-xl"
+      >
+        <!--
+          NEU: shadow-md erzeugt einen Schatten.
+          hover:shadow-md → Schatten bei Mausberührung.
+
+          focus-within:border-blue-500 → blauer Rahmen,
+          solange ein enthaltenes Element den Fokus hat,
+          zum Beispiel das Suchfeld beim Tippen.
+        -->
+        <div
+          class="flex items-center gap-3 hover:shadow-md px-4 py-3 border border-gray-300 focus-within:border-blue-500 rounded-full"
+        >
+          <!--
+            NEU: Lupe als SVG.
+
+            fill="none" → keine Füllung.
+            stroke="currentColor" → Linienfarbe folgt der Textfarbe.
+            stroke-width="2" → Dicke der gezeichneten Linien.
+            line mit x1/y1 und x2/y2 → Linie zwischen zwei Punkten.
+
+            shrink-0 → Flexbox darf dieses Symbol nicht zusammendrücken.
+          -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+            class="w-5 h-5 text-gray-400 shrink-0"
+          >
+            <circle cx="10" cy="10" r="6" />
+            <line x1="15" y1="15" x2="21" y2="21" />
+          </svg>
+
+          <!--
+            NEU: min-w-0 erlaubt dem Eingabefeld, in Flexbox
+            auch auf kleinen Bildschirmen ausreichend zu schrumpfen.
+
+            flex-1 → nimmt den übrigen Platz in der Suchleiste ein.
+            outline-none → entfernt die eigene Fokus-Außenkontur.
+            Der Fokus bleibt durch den blauen Elternrahmen sichtbar.
+          -->
+          <input
+            type="text"
+            name="q"
+            aria-label="Suchbegriff"
+            required
+            class="flex-1 bg-white outline-none min-w-0 text-base"
+          />
+        </div>
+
+        <!--
+          NEU: justify-center zentriert die Kinder dieser Flex-Zeile.
+          cursor-pointer zeigt beim Darüberfahren eine Zeigerhand.
+          border-transparent reserviert einen unsichtbaren Rahmen.
+          Beim Hover wird er sichtbar, ohne den Button zu vergrößern.
+        -->
+        <div class="flex flex-wrap justify-center gap-3 mt-7">
+          <button
+            type="submit"
+            class="bg-gray-50 hover:shadow-sm px-4 py-2 border border-transparent hover:border-gray-300 rounded-sm cursor-pointer"
+          >
+            Google Suche
+          </button>
+
+          <!--
+            Dieser Link öffnet die Google-Doodles.
+            Er ist hier eine einfache Alternative zur echten
+            „Auf gut Glück“-Funktion.
+          -->
+          <a
+            href="https://doodles.google/"
+            class="bg-gray-50 hover:shadow-sm px-4 py-2 border border-transparent hover:border-gray-300 rounded-sm"
+          >
+            Auf gut Glück!
+          </a>
+        </div>
+      </form>
+    </main>
+
+    <!-- NEU: footer ist der Fußbereich der Seite. -->
+    <footer class="bg-gray-200">
+      <p class="px-8 py-4 border-gray-300 border-b">
+        Deutschland
+      </p>
+
+      <div class="flex flex-wrap justify-between gap-5 px-8 py-4">
+        <div class="flex flex-wrap gap-5">
+          <a href="https://ads.google.com/" class="hover:underline">
+            Werbeprogramme
+          </a>
+
+          <a href="https://smallbusiness.withgoogle.com/" class="hover:underline">
+            Unternehmen
+          </a>
+
+          <a href="https://www.google.com/search/howsearchworks/" class="hover:underline">
+            Wie funktioniert die Google Suche?
+          </a>
+        </div>
+
+        <div class="flex flex-wrap gap-5">
+          <a href="https://policies.google.com/privacy" class="hover:underline">
+            Datenschutzerklärung
+          </a>
+
+          <a href="https://policies.google.com/terms" class="hover:underline">
+            Nutzungsbedingungen
+          </a>
+
+          <!-- Bekannt: @click kehrt den Wahrheitswert um. -->
+          <button
+            type="button"
+            @click="einstellungenOffen = !einstellungenOffen"
+            class="hover:underline cursor-pointer"
+          >
+            Einstellungen
+          </button>
+        </div>
+      </div>
+
+      <!--
+        Bekannt: x-show zeigt den Bereich abhängig vom Wahrheitswert.
+        NEU: x-cloak wird oben im head erklärt.
+      -->
+      <div
+        x-cloak
+        x-show="einstellungenOffen"
+        class="px-8 py-4 border-gray-300 border-t"
+      >
+        <a
+          href="https://www.google.com/preferences"
+          class="text-blue-700 hover:underline"
+        >
+          Google-Sucheinstellungen öffnen
+        </a>
+      </div>
+    </footer>
+  </body>
+</html>

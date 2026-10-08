@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Google – Anfänger-Übung</title>
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x" defer></script>
+
+    <!--
+      NEU: Elemente mit x-cloak bleiben verborgen,
+      bis Alpine die Steuerung übernimmt.
+    -->
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <!--
+    NEU:
+    flex + flex-col → direkte Kinder untereinander anordnen.
+    min-h-screen → mindestens die gesamte Fensterhöhe ausfüllen.
+
+    font-[Arial] → eigene Schriftart festlegen.
+    text-[#202124] → eigene Textfarbe als Hex-Farbcode.
+    Die eckigen Klammern kennst du bereits von eigenen Größen.
+
+    googleSeite() liefert die Daten und Funktionen für Alpine.
+    Die Funktion steht am Ende der Datei.
+  -->
+  <body
+    class="flex min-h-screen flex-col bg-white font-[Arial] text-sm text-[#202124]"
+    x-data="googleSeite()"
+  >
+    <!--
+      NEU: header = Kopfbereich.
+
+      flex → Kinder nebeneinander.
+      items-center → hier senkrecht mittig.
+      justify-between → freier Platz zwischen den Kindern.
+      gap-4 → Abstand zwischen den Kindern.
+      flex-wrap → bei Platzmangel auf eine neue Zeile umbrechen.
+    -->
+    <header class="flex flex-wrap items-center justify-between gap-4 px-5 py-3">
+      <div class="flex items-center gap-5">
+        <!-- NEU: hover:underline unterstreicht bei Mausberührung. -->
+        <a href="https://about.google/" class="hover:underline">
+          Über Google
+        </a>
+
+        <a href="https://store.google.com/" class="hover:underline">
+          Store
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="https://mail.google.com/" class="text-[13px] hover:underline">
+          Gmail
+        </a>
+
+        <a href="https://images.google.com/" class="text-[13px] hover:underline">
+          Bilder
+        </a>
+
+        <!--
+          NEU: relative macht diesen Bereich zum Bezugspunkt
+          für das gleich folgende absolut positionierte Menü.
+
+          @click.outside → reagiert auf Klicks außerhalb dieses Bereichs.
+          @keydown.escape.window → Escape schließt das Menü überall.
+        -->
+        <div
+          class="relative"
+          @click.outside="appsOffen = false"
+          @keydown.escape.window="appsOffen = false"
+        >
+          <!--
+            NEU: aria-label benennt einen Button ohne sichtbaren Text.
+            :aria-expanded ist kurz für x-bind:aria-expanded.
+            Alpine aktualisiert das Attribut passend zu appsOffen.
+
+            cursor-pointer → Zeigerhand beim Darüberfahren.
+            hover:bg-gray-100 → Hintergrund bei Mausberührung.
+          -->
+          <button
+            type="button"
+            aria-label="Google-Apps"
+            :aria-expanded="appsOffen"
+            @click="appsOffen = !appsOffen"
+            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full hover:bg-gray-100"
+          >
+            <!--
+              NEU: SVG = skalierbare Vektorgrafik.
+              viewBox legt das interne Koordinatensystem fest.
+              fill="currentColor" übernimmt die Textfarbe.
+              circle zeichnet einen Kreis:
+              cx/cy = Mittelpunkt, r = Radius.
+
+              aria-hidden versteckt die Grafik vor Vorleseprogrammen;
+              der Button hat bereits einen verständlichen Namen.
+            -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              class="h-6 w-6 text-gray-600"
+            >
+              <circle cx="5" cy="5" r="2" />
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="19" cy="5" r="2" />
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+              <circle cx="5" cy="19" r="2" />
+              <circle cx="12" cy="19" r="2" />
+              <circle cx="19" cy="19" r="2" />
+            </svg>
+          </button>
+
+          <!--
+            NEU:
+            absolute → Menü nimmt keinen Platz im normalen Seitenfluss ein.
+            right-0 → am rechten Rand des relative-Elternelements ausrichten.
+            top-full → direkt unter diesem Elternelement positionieren.
+            z-10 → über normalen Seiteninhalten anzeigen.
+            shadow-lg → deutlicher Schatten.
+            block → Links werden jeweils als eigener Block dargestellt.
+          -->
+          <div
+            x-cloak
+            x-show="appsOffen"
+            class="absolute top-full right-0 z-10 mt-2 w-48 rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
+          >
+            <a
+              href="https://mail.google.com/"
+              class="block rounded-lg p-3 hover:bg-blue-50"
+            >
+              Gmail
+            </a>
+
+            <a
+              href="https://maps.google.com/"
+              class="block rounded-lg p-3 hover:bg-blue-50"
+            >
+              Maps
+            </a>
+
+            <a
+              href="https://drive.google.com/"
+              class="block rounded-lg p-3 hover:bg-blue-50"
+            >
+              Drive
+            </a>
+
+            <a
+              href="https://www.youtube.com/"
+              class="block rounded-lg p-3 hover:bg-blue-50"
+            >
+              YouTube
+            </a>
+          </div>
+        </div>
+
+        <a
+          href="https://accounts.google.com/"
+          class="rounded-full bg-[#0b57d0] px-6 py-3 font-medium text-white hover:bg-[#0842a0]"
+        >
+          Anmelden
+        </a>
+      </div>
+    </header>
+
+    <!--
+      NEU: main = Hauptinhalt.
+      flex-1 → füllt den übrigen Platz zwischen Header und Footer.
+      flex-col + items-center → Kinder untereinander und horizontal mittig.
+
+      sm:pt-28 → ab 640px Bildschirmbreite mehr Abstand oben.
+      Ohne sm: gilt pt-16. Das ist eine responsive Anpassung.
+    -->
+    <main class="flex flex-1 flex-col items-center px-5 pt-16 pb-12 sm:pt-28">
+      <!--
+        Das Logo ist eine externe PNG-Bilddatei.
+        alt liefert einen Ersatztext und einen Namen für Vorleseprogramme.
+        h-auto erhält beim Skalieren das Seitenverhältnis.
+      -->
+      <h1 class="mb-7">
+        <img
+          src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+          alt="Google"
+          width="272"
+          height="92"
+          class="h-auto w-[272px]"
+        />
+      </h1>
+
+      <!--
+        NEU: max-w-[584px] begrenzt die Breite auf 584px.
+        Mit w-full passt sich das Formular kleineren Bildschirmen an.
+
+        method="get" + name="q" übergeben den Suchbegriff an Google.
+        Kein @submit.prevent: Das Formular soll wirklich weiterleiten.
+      -->
+      <form
+        action="https://www.google.com/search"
+        method="get"
+        class="w-full max-w-[584px]"
+      >
+        <!--
+          NEU: hover:shadow-md erzeugt bei Mausberührung einen Schatten.
+
+          focus-within: greift, sobald ein Kindelement Fokus erhält.
+          Der blaue Rahmen zeigt also an, dass man im Suchfeld tippt.
+        -->
+        <div
+          class="flex h-[50px] items-center gap-3 rounded-full border border-[#dfe1e5] px-4 hover:shadow-md focus-within:border-blue-500"
+        >
+          <!--
+            NEU: fill="none" → keine Füllung.
+            stroke → Linienfarbe; stroke-width → Linienstärke.
+            line → Linie zwischen x1/y1 und x2/y2.
+            shrink-0 → Symbol wird von Flexbox nicht zusammengedrückt.
+          -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+            class="h-5 w-5 shrink-0 text-gray-400"
+          >
+            <circle cx="10" cy="10" r="6" />
+            <line x1="15" y1="15" x2="21" y2="21" />
+          </svg>
+
+          <!--
+            NEU: flex-1 → das Eingabefeld erhält den restlichen Platz.
+            min-w-0 → es darf bei Platzmangel kleiner werden.
+            outline-none → eigene Fokus-Außenkontur entfernen.
+            Als Ersatz wird der Rahmen um die Suchleiste blau.
+          -->
+          <input
+            type="text"
+            name="q"
+            aria-label="Suchbegriff"
+            required
+            class="h-full min-w-0 flex-1 text-base outline-none"
+          />
+
+          <!--
+            type="button" verhindert das Absenden des Formulars.
+            Bekannt: @click ruft eine Funktion auf.
+
+            NEU: title zeigt beim längeren Darüberfahren einen Hinweis.
+          -->
+          <button
+            type="button"
+            aria-label="Information zur Sprachsuche"
+            title="Sprachsuche – Demo"
+            @click="zeigeSprachHinweis()"
+            class="shrink-0 cursor-pointer rounded-full p-1 hover:bg-gray-100"
+          >
+            <!--
+              Vereinfachtes Mikrofon-Symbol.
+
+              NEU: rect zeichnet ein Rechteck.
+              x/y = Position; width/height = Größe; rx = Eckenrundung.
+
+              path zeichnet einen Pfad anhand der Angaben in d.
+              M = Startpunkt, V = senkrechte Linie,
+              a = Bogen. Solche Pfaddaten kann man fertig übernehmen.
+            -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              class="h-6 w-6"
+            >
+              <rect x="9" y="2" width="6" height="12" rx="3" fill="#4285f4" />
+              <path
+                d="M5 10 V12 a7 7 0 0 0 14 0 V10"
+                fill="none"
+                stroke="#ea4335"
+                stroke-width="2"
+              />
+              <path d="M12 19 V22" stroke="#34a853" stroke-width="2" />
+              <path d="M8 22 H16" stroke="#fbbc05" stroke-width="2" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            aria-label="Information zur Bildsuche"
+            title="Bildsuche – Demo"
+            @click="zeigeBildHinweis()"
+            class="shrink-0 cursor-pointer rounded-full p-1 hover:bg-gray-100"
+          >
+            <!--
+              Vereinfachtes Kamera-Symbol, kein exaktes Google-Lens-Logo.
+              NEU: H in einem SVG-Pfad zeichnet eine waagerechte Linie.
+            -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="2.5"
+              aria-hidden="true"
+              class="h-6 w-6"
+            >
+              <path d="M3 9 V5 H9" stroke="#ea4335" />
+              <path d="M15 5 H21 V9" stroke="#4285f4" />
+              <path d="M21 15 V20 H15" stroke="#34a853" />
+              <path d="M9 20 H3 V15" stroke="#fbbc05" />
+              <circle cx="12" cy="12" r="4" stroke="#4285f4" />
+            </svg>
+          </button>
+        </div>
+
+        <!--
+          NEU: justify-center zentriert die Buttons innerhalb der Zeile.
+          border-transparent → zunächst unsichtbarer Rahmen.
+          hover:border-gray-300 → Rahmen bei Mausberührung sichtbar.
+          hover:shadow-sm → kleiner Schatten bei Mausberührung.
+        -->
+        <div class="mt-7 flex flex-wrap justify-center gap-3">
+          <button
+            type="submit"
+            class="cursor-pointer rounded-sm border border-transparent bg-[#f8f9fa] px-4 py-2 hover:border-gray-300 hover:shadow-sm"
+          >
+            Google Suche
+          </button>
+
+          <!-- Vereinfachung: öffnet Doodles statt einer Zufallssuche. -->
+          <a
+            href="https://doodles.google/"
+            class="rounded-sm border border-transparent bg-[#f8f9fa] px-4 py-2 hover:border-gray-300 hover:shadow-sm"
+          >
+            Auf gut Glück!
+          </a>
+        </div>
+      </form>
+
+      <!--
+        Bekannt: x-show steuert die Sichtbarkeit, x-text den Text.
+        hinweis !== '' bedeutet: Hinweis ist nicht leer.
+
+        NEU: aria-live="polite" lässt Vorleseprogramme Änderungen
+        bei passender Gelegenheit vorlesen.
+      -->
+      <p
+        x-cloak
+        x-show="hinweis !== ''"
+        x-text="hinweis"
+        aria-live="polite"
+        class="mt-6 max-w-[584px] text-center text-gray-600"
+      ></p>
+    </main>
+
+    <!-- NEU: footer = Fußbereich. -->
+    <footer class="bg-[#f2f2f2]">
+      <p class="border-b border-[#dadce0] px-8 py-4 text-[15px]">
+        Deutschland
+      </p>
+
+      <!--
+        Auf schmalen Bildschirmen: Links mittig anordnen und umbrechen.
+        NEU: md:justify-between verteilt die beiden Linkgruppen
+        ab 768px Bildschirmbreite auf die beiden Seiten.
+      -->
+      <div
+        class="flex flex-wrap justify-center gap-5 px-8 py-4 md:justify-between"
+      >
+        <div class="flex flex-wrap justify-center gap-6">
+          <a href="https://ads.google.com/" class="hover:underline">
+            Werbeprogramme
+          </a>
+
+          <a href="https://smallbusiness.withgoogle.com/" class="hover:underline">
+            Unternehmen
+          </a>
+
+          <a href="https://www.google.com/search/howsearchworks/" class="hover:underline">
+            Wie funktioniert die Google Suche?
+          </a>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6">
+          <a href="https://policies.google.com/privacy" class="hover:underline">
+            Datenschutzerklärung
+          </a>
+
+          <a href="https://policies.google.com/terms" class="hover:underline">
+            Nutzungsbedingungen
+          </a>
+
+          <a href="https://www.google.com/preferences" class="hover:underline">
+            Einstellungen
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Bekannt aus deinen Formularübungen:
+      // Diese Funktion liefert ein Objekt mit Daten und Funktionen.
+      // x-data="googleSeite()" macht es für Alpine verfügbar.
+      function googleSeite() {
+        return {
+          appsOffen: false,
+          hinweis: '',
+
+          // this.hinweis verändert die Eigenschaft unseres Alpine-Objekts.
+          zeigeSprachHinweis() {
+            this.hinweis =
+              'Dies ist eine Layout-Übung. Die Sprachsuche ist hier nicht eingebaut.';
+          },
+
+          zeigeBildHinweis() {
+            this.hinweis =
+              'Dies ist eine Layout-Übung. Ein Bild-Upload ist hier nicht eingebaut.';
+          }
+        };
+      }
+    </script>
+  </body>
+</html>

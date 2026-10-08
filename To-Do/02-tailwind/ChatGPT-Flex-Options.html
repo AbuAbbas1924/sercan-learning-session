@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Tailwind – Flexbox Parent-Optionen</title>
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body class="bg-gray-950 p-6 font-sans text-white">
+    <h1 class="mb-4 font-bold text-3xl">
+      Flexbox – Optionen für den Parent
+    </h1>
+
+    <p class="mb-2 text-gray-300">
+      Die nummerierten Boxen sind die direkten Kinder des Flex-Containers.
+    </p>
+
+    <p class="mb-8 text-gray-300">
+      Bei flex-row: justify = horizontal, items = vertikal.
+      Bei flex-col: justify = vertikal, items = horizontal.
+    </p>
+
+    <!--
+      Das äußere Grid ordnet nur die Beispiele auf dieser Seite an.
+
+      grid-cols-1    → auf kleinen Bildschirmen eine Spalte
+      md:grid-cols-2 → ab mittleren Bildschirmen zwei Spalten
+      xl:grid-cols-3 → auf großen Bildschirmen drei Spalten
+
+      Die farbigen Container darin sind unsere Flex-Parents.
+    -->
+
+
+    <!-- ================================================== -->
+    <!-- 1. FLEX AKTIVIEREN                                  -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">1. Flex aktivieren</h2>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">flex</h3>
+
+        <div class="bg-gray-800 p-4 rounded">
+          <span>Text davor</span>
+
+          <!-- Flex-Container nimmt als Block eine eigene Zeile ein. -->
+          <div class="flex gap-2 bg-red-200 p-3 text-gray-950">
+            <div class="bg-red-400 p-3">1</div>
+            <div class="bg-red-400 p-3">2</div>
+            <div class="bg-red-400 p-3">3</div>
+          </div>
+
+          <span>Text danach</span>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">inline-flex</h3>
+
+        <div class="bg-gray-800 p-4 rounded">
+          <span>Text davor</span>
+
+          <!-- Flex-Container kann neben dem Text stehen. -->
+          <div class="inline-flex gap-2 bg-red-200 p-3 text-gray-950">
+            <div class="bg-red-400 p-3">1</div>
+            <div class="bg-red-400 p-3">2</div>
+            <div class="bg-red-400 p-3">3</div>
+          </div>
+
+          <span>Text danach</span>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 2. RICHTUNG                                        -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">2. Richtung</h2>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">flex-row</h3>
+
+        <!-- Nebeneinander: links nach rechts -->
+        <div class="flex flex-row items-start gap-2 bg-orange-200 p-4 h-64 text-gray-950">
+          <div class="bg-orange-400 p-3">1</div>
+          <div class="bg-orange-400 p-3">2</div>
+          <div class="bg-orange-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">flex-row-reverse</h3>
+
+        <!-- Nebeneinander: rechts nach links -->
+        <div class="flex flex-row-reverse items-start gap-2 bg-orange-200 p-4 h-64 text-gray-950">
+          <div class="bg-orange-400 p-3">1</div>
+          <div class="bg-orange-400 p-3">2</div>
+          <div class="bg-orange-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">flex-col</h3>
+
+        <!-- Untereinander: oben nach unten -->
+        <div class="flex flex-col items-start gap-2 bg-orange-200 p-4 h-64 text-gray-950">
+          <div class="bg-orange-400 p-3">1</div>
+          <div class="bg-orange-400 p-3">2</div>
+          <div class="bg-orange-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">flex-col-reverse</h3>
+
+        <!-- Untereinander: unten nach oben -->
+        <div class="flex flex-col-reverse items-start gap-2 bg-orange-200 p-4 h-64 text-gray-950">
+          <div class="bg-orange-400 p-3">1</div>
+          <div class="bg-orange-400 p-3">2</div>
+          <div class="bg-orange-400 p-3">3</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 3. UMBRUCH                                         -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">3. Umbruch</h2>
+
+    <p class="mb-4 text-gray-300">
+      Die Kinder haben hier feste Breiten.
+      shrink-0 verhindert, dass sie schmaler werden.
+    </p>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">flex-nowrap</h3>
+
+        <!-- Kein Umbruch. Bei Platzmangel horizontal scrollbar. -->
+        <div class="flex flex-nowrap items-start gap-2 bg-yellow-200 p-4 w-64 max-w-full h-56 overflow-x-auto text-gray-950">
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">1</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">2</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">3</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">flex-wrap</h3>
+
+        <!-- Neue Zeilen entstehen darunter. -->
+        <div class="flex flex-wrap items-start content-start gap-2 bg-yellow-200 p-4 w-64 max-w-full h-56 text-gray-950">
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">1</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">2</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">3</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">flex-wrap-reverse</h3>
+
+        <!-- Erste Zeile unten, weitere Zeilen darüber. -->
+        <div class="flex flex-wrap-reverse items-start content-start gap-2 bg-yellow-200 p-4 w-64 max-w-full h-56 text-gray-950">
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">1</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">2</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">3</div>
+          <div class="bg-yellow-400 p-3 w-24 shrink-0">4</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 4. JUSTIFY: AUSRICHTUNG AUF DER HAUPTACHSE          -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">4. justify – Hauptachse</h2>
+
+    <p class="mb-4 text-gray-300">
+      Hier gilt flex-row. Deshalb wirkt justify horizontal.
+    </p>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">justify-start</h3>
+
+        <div class="flex justify-start items-center gap-2 bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-center</h3>
+
+        <div class="flex justify-center items-center gap-2 bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-end</h3>
+
+        <div class="flex justify-end items-center gap-2 bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-between</h3>
+
+        <div class="flex justify-between items-center bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-around</h3>
+
+        <div class="flex justify-around items-center bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-evenly</h3>
+
+        <div class="flex justify-evenly items-center bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-normal</h3>
+
+        <!-- Bei Flex wie justify-start. -->
+        <div class="flex justify-normal items-center gap-2 bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-stretch</h3>
+
+        <!-- Streckt Flex-Kinder nicht. Hier wie justify-start. -->
+        <div class="flex justify-stretch items-center gap-2 bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">1</div>
+          <div class="bg-green-400 p-3">2</div>
+          <div class="bg-green-400 p-3">3</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 5. ITEMS: AUSRICHTUNG AUF DER QUERACHSE             -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">5. items – Querachse</h2>
+
+    <p class="mb-4 text-gray-300">
+      Hier gilt flex-row. Deshalb wirkt items vertikal.
+    </p>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">items-start</h3>
+
+        <div class="flex justify-center items-start gap-2 bg-blue-200 p-4 h-48 text-gray-950">
+          <div class="bg-blue-400 p-3">1</div>
+          <div class="bg-blue-400 px-3 py-6">2</div>
+          <div class="bg-blue-400 px-3 py-9">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-center</h3>
+
+        <div class="flex justify-center items-center gap-2 bg-blue-200 p-4 h-48 text-gray-950">
+          <div class="bg-blue-400 p-3">1</div>
+          <div class="bg-blue-400 px-3 py-6">2</div>
+          <div class="bg-blue-400 px-3 py-9">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-end</h3>
+
+        <div class="flex justify-center items-end gap-2 bg-blue-200 p-4 h-48 text-gray-950">
+          <div class="bg-blue-400 p-3">1</div>
+          <div class="bg-blue-400 px-3 py-6">2</div>
+          <div class="bg-blue-400 px-3 py-9">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-stretch</h3>
+
+        <!-- Keine feste Höhe an den Kindern: Sie dürfen sich strecken. -->
+        <div class="flex justify-center items-stretch gap-2 bg-blue-200 p-4 h-48 text-gray-950">
+          <div class="bg-blue-400 p-3">1</div>
+          <div class="bg-blue-400 p-3">2</div>
+          <div class="bg-blue-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-baseline</h3>
+
+        <!-- Unterschiedliche Schriftgrößen, gleiche erste Textgrundlinie. -->
+        <div class="flex justify-center items-baseline gap-2 bg-blue-200 p-4 h-48 text-gray-950">
+          <div class="bg-blue-400 p-3 text-sm">Hallo</div>
+          <div class="bg-blue-400 p-3 text-2xl">Hallo</div>
+          <div class="bg-blue-400 p-3 text-4xl">Hi</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-baseline-last</h3>
+
+        <!-- Die letzten Textzeilen werden aneinander ausgerichtet. -->
+        <div class="flex justify-center items-baseline-last gap-2 bg-blue-200 p-4 h-48 text-gray-950">
+          <div class="bg-blue-400 p-3">Eine Zeile</div>
+          <div class="bg-blue-400 p-3">Zwei<br />Zeilen</div>
+          <div class="bg-blue-400 p-3">Hier sind<br />drei<br />Zeilen</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 6. CONTENT: GANZE FLEX-ZEILEN VERTEILEN             -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">6. content – Flex-Zeilen</h2>
+
+    <p class="mb-4 text-gray-300">
+      Alle Beispiele verwenden flex-wrap.
+      Je zwei Kinder passen in eine Zeile.
+    </p>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">content-start</h3>
+
+        <div class="flex flex-wrap content-start gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-center</h3>
+
+        <div class="flex flex-wrap content-center gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-end</h3>
+
+        <div class="flex flex-wrap content-end gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-between</h3>
+
+        <div class="flex flex-wrap content-between gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-around</h3>
+
+        <div class="flex flex-wrap content-around gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-evenly</h3>
+
+        <div class="flex flex-wrap content-evenly gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-stretch</h3>
+
+        <!--
+          Die Flex-Zeilen werden höher.
+          Durch das standardmäßige items-stretch wachsen die Kinder mit.
+        -->
+        <div class="flex flex-wrap content-stretch gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-normal</h3>
+
+        <!-- Bei Flex wie content-stretch. -->
+        <div class="flex flex-wrap content-normal gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">content-baseline</h3>
+
+        <!--
+          Baseline-Ausrichtung der Zeilen.
+          In diesem einfachen Beispiel kann es wie content-start aussehen.
+          Für Textausrichtung innerhalb einer Zeile: items-baseline.
+        -->
+        <div class="flex flex-wrap content-baseline gap-2 bg-purple-200 p-4 w-64 max-w-full h-72 text-gray-950">
+          <div class="bg-purple-400 p-3 w-24">1</div>
+          <div class="bg-purple-400 p-3 w-24">2</div>
+          <div class="bg-purple-400 p-3 w-24">3</div>
+          <div class="bg-purple-400 p-3 w-24">4</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 7. ABSTÄNDE                                        -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">7. Abstände mit gap</h2>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">gap-0</h3>
+
+        <div class="flex flex-wrap content-start gap-0 bg-pink-200 p-4 w-64 max-w-full h-48 text-gray-950">
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">1</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">2</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">3</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">gap-4</h3>
+
+        <div class="flex flex-wrap content-start gap-4 bg-pink-200 p-4 w-64 max-w-full h-48 text-gray-950">
+          <div class="bg-pink-400 p-3 w-24">1</div>
+          <div class="bg-pink-400 p-3 w-24">2</div>
+          <div class="bg-pink-400 p-3 w-24">3</div>
+          <div class="bg-pink-400 p-3 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">gap-x-4</h3>
+
+        <!-- Nur horizontaler Abstand -->
+        <div class="flex flex-wrap content-start gap-x-4 bg-pink-200 p-4 w-64 max-w-full h-48 text-gray-950">
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">1</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">2</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">3</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">gap-y-4</h3>
+
+        <!-- Nur vertikaler Abstand -->
+        <div class="flex flex-wrap content-start gap-y-4 bg-pink-200 p-4 w-64 max-w-full h-48 text-gray-950">
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">1</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">2</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">3</div>
+          <div class="bg-pink-400 p-3 border border-pink-700 w-24">4</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">gap-[20px]</h3>
+
+        <div class="flex flex-wrap content-start gap-[20px] bg-pink-200 p-4 w-64 max-w-full h-48 text-gray-950">
+          <div class="bg-pink-400 p-3 w-24">1</div>
+          <div class="bg-pink-400 p-3 w-24">2</div>
+          <div class="bg-pink-400 p-3 w-24">3</div>
+          <div class="bg-pink-400 p-3 w-24">4</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 8. SAFE BEI PLATZMANGEL                             -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">8. Safe bei Platzmangel</h2>
+
+    <p class="mb-4 text-gray-300">
+      Die Kinder sind hier absichtlich größer als der Parent.
+      Safe richtet sie bei Platzmangel am Anfang aus.
+    </p>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">justify-center-safe</h3>
+
+        <div class="flex justify-center-safe bg-cyan-200 p-4 w-64 max-w-full overflow-auto text-gray-950">
+          <div class="bg-cyan-400 p-4 w-80 shrink-0">
+            Dieses Kind ist breiter als der Parent.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-end-safe</h3>
+
+        <div class="flex justify-end-safe bg-cyan-200 p-4 w-64 max-w-full overflow-auto text-gray-950">
+          <div class="bg-cyan-400 p-4 w-80 shrink-0">
+            Dieses Kind ist breiter als der Parent.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-center-safe</h3>
+
+        <div class="flex items-center-safe bg-cyan-200 p-4 h-32 overflow-auto text-gray-950">
+          <div class="bg-cyan-400 p-4 h-48">
+            Dieses Kind ist höher als der Parent.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-end-safe</h3>
+
+        <div class="flex items-end-safe bg-cyan-200 p-4 h-32 overflow-auto text-gray-950">
+          <div class="bg-cyan-400 p-4 h-48">
+            Dieses Kind ist höher als der Parent.
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 9. KOMBINATIONEN AUS DEINEM BEISPIEL                -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">9. place und justify-items</h2>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-10">
+      <section>
+        <h3 class="mb-2 font-mono">place-items-center</h3>
+
+        <!--
+          Setzt align-items und justify-items.
+          Bei Flex wirkt nur align-items.
+          Deshalb: vertikal mittig, horizontal am Anfang.
+        -->
+        <div class="flex place-items-center bg-red-200 p-4 h-40 text-gray-950">
+          <div class="bg-red-400 p-3">Nur vertikal mittig</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">place-content-center</h3>
+
+        <!--
+          Setzt align-content und justify-content.
+          Ohne Umbruch wirkt hier nur justify-content.
+          h-fit verhindert die standardmäßige Höhenstreckung des Kindes.
+        -->
+        <div class="flex place-content-center bg-red-200 p-4 h-40 text-gray-950">
+          <div class="bg-red-400 p-3 h-fit">Nur horizontal mittig</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">justify-items-center</h3>
+
+        <!-- Hat bei Flex keine Wirkung. -->
+        <div class="flex justify-items-center bg-red-200 p-4 h-40 text-gray-950">
+          <div class="bg-red-400 p-3 h-fit">Bleibt links oben</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">items-center justify-center</h3>
+
+        <!-- Beide Achsen zentrieren. -->
+        <div class="flex justify-center items-center bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">Auf beiden Achsen mittig</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">place-items-center place-content-center</h3>
+
+        <!--
+          align-items zentriert auf der Querachse.
+          justify-content zentriert auf der Hauptachse.
+        -->
+        <div class="flex place-content-center place-items-center bg-green-200 p-4 h-40 text-gray-950">
+          <div class="bg-green-400 p-3">Auch auf beiden Achsen mittig</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- 10. ACHSENVERGLEICH: ROW UND COL                    -->
+    <!-- ================================================== -->
+
+    <h2 class="mb-4 font-bold text-2xl">10. Gleiche Ausrichtung, andere Richtung</h2>
+
+    <div class="gap-5 grid grid-cols-1 md:grid-cols-2">
+      <section>
+        <h3 class="mb-2 font-mono">
+          flex-row items-center justify-end
+        </h3>
+
+        <!-- justify-end → rechts -->
+        <!-- items-center → vertikal mittig -->
+        <div class="flex flex-row justify-end items-center gap-2 bg-indigo-200 p-4 h-64 text-gray-950">
+          <div class="bg-indigo-400 p-3">1</div>
+          <div class="bg-indigo-400 p-3">2</div>
+          <div class="bg-indigo-400 p-3">3</div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-2 font-mono">
+          flex-col items-center justify-end
+        </h3>
+
+        <!-- justify-end → unten -->
+        <!-- items-center → horizontal mittig -->
+        <div class="flex flex-col justify-end items-center gap-2 bg-indigo-200 p-4 h-64 text-gray-950">
+          <div class="bg-indigo-400 p-3">1</div>
+          <div class="bg-indigo-400 p-3">2</div>
+          <div class="bg-indigo-400 p-3">3</div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
