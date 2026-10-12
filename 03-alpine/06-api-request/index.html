@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Document</title>
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div x-data="ourData()">
+        <input
+            type="number"
+            class="p-2 border-2 border-green-500"
+            placeholder="userID"
+        >
+        <input
+            type="number"
+            class="p-2 border-2 border-green-500"
+            placeholder="id"
+        >
+        <input
+            type="text"
+            class="p-2 border-2 border-green-500"
+            placeholder="title"
+        >
+        <textarea
+            placeholder="body"
+            class="p-2 border-2 border-green-500"
+        ></textarea>
+        <button class="block bg-blue-500 px-6 py-3 rounded-xl w-full text-white"> send</button>
+        <div>
+            <template
+                x-for="post in posts"
+                :key="post.id"
+            >
+                <div class="m-2 p-4 border-2 border-gray-300">
+                    <h3
+                        class="font-bold text-lg"
+                        x-text="post.title"
+                    ></h3>
+                    <p
+                        class="text-gray-600"
+                        x-text="post.body"
+                    ></p>
+                </div>
+            </template>
+        </div>
+    </div>
+</body>
+<script>
+    function ourData() {
+        return {
+            apiAdress: "https://jsonplaceholder.typicode.com/posts",
+            userID: '',
+            id: '',
+            title: '',
+            body: '',
+            posts: [],
+            init() {
+                fetch(this.apiAdress)
+                    .then(res => res.json())
+                    .then(data => this.posts = data)
+            },
+        }
+    }
+</script>
+
+</html>
