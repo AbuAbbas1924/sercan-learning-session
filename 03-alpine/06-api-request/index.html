@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Document</title>
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div x-data="ourData()">
+        <input
+            type="number"
+            class="p-2 border-2 border-green-500"
+            placeholder="userID"
+            x-model="userID"
+        >
+        <input
+            type="number"
+            class="p-2 border-2 border-green-500"
+            placeholder="id"
+            x-model="id"
+        >
+        <input
+            type="text"
+            class="p-2 border-2 border-green-500"
+            placeholder="title"
+            x-model="title"
+        >
+        <textarea
+            placeholder="body"
+            class="p-2 border-2 border-green-500"
+            x-model="body"
+        ></textarea>
+        <button
+            class="block bg-blue-500 px-6 py-3 rounded-xl w-full text-white"
+            @click="sending"
+        > send</button>
+        <!-- <div>
+            <template
+                x-for="post in posts"
+                :key="post.id"
+            >
+                <div class="m-2 p-4 border-2 border-gray-300">
+                    <h3
+                        class="font-bold text-lg"
+                        x-text="post.title"
+                    ></h3>
+                    <p
+                        class="text-gray-600"
+                        x-text="post.body"
+                    ></p>
+                </div>
+            </template>
+        </div> -->
+        <!-- <pre x-text="fetch(apiAdress).then(res => res.text())"></pre> -->
+        <div class="text-xl">received</div>
+        <pre x-text="JSON.stringify(response, null, 2)"></pre>
+        <hr>
+        <div class="text-xl">sended</div>
+        <pre x-text="JSON.stringify(objectitize(userID, id, title, body), null, 2)"></pre>
+    </div>
+    <!-- <div
+            x-data="{response: {}}"
+            x-init="(await fetch('https://jsonplaceholder.typicode.com/posts')).json().then(data => response = data.slice(0, 5))"
+        >
+                            <div>
+                                <template x-for="object in response">
+                                    <div class="m-2 p-4 border-2 border-gray-300">
+                                        <div class="flex justify-between">
+                                            <p x-text="`UserID: ${object.userId}`"></p>
+                                            <p x-text="`ID: ${object.id}`"></p>
+                                        </div>
+                                        <h3
+                                            class="font-bold text-lg"
+                                            x-text="object.title"
+                                        ></h3>
+                                        <p
+                                            class="text-gray-600"
+                                            x-text="object.body"
+                                        ></p>
+                                    </div>
+                                    < </template>
+            </div>
+        </div> -->
+</body>
+<script>
+    function ourData() {
+        return {
+            apiAdress: "https://jsonplaceholder.typicode.com/posts",
+            userID: '',
+            id: '',
+            title: '',
+            body: '',
+            objectitize(a, b, c, d) {
+                return {
+                    userId: a,
+                    id: b,
+                    title: c,
+                    body: d
+                }
+            },
+            posts: [],
+            init() {
+                fetch(this.apiAdress)
+                    .then(res => res.json())
+                    .then(data => this.posts = data)
+            },
+            response: null,
+            sending() {
+                console.log('sending');
+                fetch(this.apiAdress, {
+                    method: 'POST',
+                    body: JSON.stringify(this.objectitize(this.userID, this.id, this.title, this.body)),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                })
+                    .then((response) => response.json())
+                    .then((json) => {
+                        this.response = json;
+                        console.log(json);
+                    });
+            }
+        }
+    }
+</script>
+
+</html>
