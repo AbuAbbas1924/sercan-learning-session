@@ -54,8 +54,17 @@
                 </div>
             </template>
         </div> -->
-        <pre x-text="fetch(apiAdress).then(res => res.text())"></pre>
-    </div>
+        <!-- <pre x-text="fetch(apiAdress).then(res => res.text())"></pre> -->
+        </div>
+        <div
+            x-data="{response: {}}"
+            x-init="(await fetch('https://jsonplaceholder.typicode.com/posts')).json().then(data => response = data)"
+        >
+            <!-- <div x-text="response ?? 'loading...'"></div> -->
+            <div>
+                <pre x-text="JSON.stringify(response, null, 2)"></pre>
+            </div>
+        </div>
 </body>
 <script>
     function ourData() {
