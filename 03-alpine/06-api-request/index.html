@@ -58,11 +58,29 @@
         </div>
         <div
             x-data="{response: {}}"
-            x-init="(await fetch('https://jsonplaceholder.typicode.com/posts')).json().then(data => response = data)"
+            x-init="(await fetch('https://jsonplaceholder.typicode.com/posts')).json().then(data => response = data.slice(0, 5))"
         >
             <!-- <div x-text="response ?? 'loading...'"></div> -->
-            <div>
-                <pre x-text="JSON.stringify(response, null, 2)"></pre>
+            <!-- <div>
+                                                                    <pre x-text="JSON.stringify(response, null, 2)"></pre>
+                                        </div> -->
+                            <div>
+                                <template x-for="object in response">
+                                    <div class="m-2 p-4 border-2 border-gray-300">
+                                        <div class="flex justify-between">
+                                            <p x-text="`UserID: ${object.userId}`"></p>
+                                            <p x-text="`ID: ${object.id}`"></p>
+                                        </div>
+                                        <h3
+                                            class="font-bold text-lg"
+                                            x-text="object.title"
+                                        ></h3>
+                                        <p
+                                            class="text-gray-600"
+                                            x-text="object.body"
+                                        ></p>
+                                    </div>
+                                    < </template>
             </div>
         </div>
 </body>
