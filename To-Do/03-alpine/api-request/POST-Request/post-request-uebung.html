@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body>
+    <h1>Beitrag erstellen</h1>
+    <form action="" x-data="beitragDaten()" @submit.prevent="senden()">
+      <label for="titel">Titel</label>
+      <br />
+      <input type="text" name="titel" id="titel" required x-model="titel" />
+      <br />
+      <label for="Inhalt">Inhalt</label>
+      <br />
+      <textarea
+        name="Inhalt"
+        id="Inhalt"
+        required
+        placeholder="Bitte hier Schreiben"
+        x-model="inhalt"
+      ></textarea>
+      <br />
+      <button type="submit">Absenden</button>
+      <p x-text="nachricht" style="white-space: pre-line;"></p>
+    </form>
+
+    <script>
+      function beitragDaten() {
+        return {
+          titel: "",
+          inhalt: "",
+          nachricht: "",
+          async senden() {
+            this.nachricht = "Wird gesendet...";
+            try {
+              const antwort = await fetch(
+                "https://jsonplaceholder.typicode.com/posts",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    title: this.titel,
+                    body: this.inhalt,
+                  }),
+                },
+              );
+              if (!antwort.ok) {
+                this.nachricht = "Fehler beim Senden";
+                return;
+              }
+              const daten = await antwort.json();
+              this.nachricht = "Beitrags-ID: " + daten.id + "\nTitel: " + daten.title + "\nInhalt: " + daten.body; 
+            } catch (fehler) {
+              this.nachricht = "Anfrage fehlgeschlagen: " + fehler.message;
+            }
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

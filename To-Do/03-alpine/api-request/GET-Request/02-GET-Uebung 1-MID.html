@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div x-data="getSearchBeitrag()">
+      <h1 class="bg-blue-500 p-3 text-white text-3xl text-center">
+        Beitrag suchen
+      </h1>
+      <input
+        class="mx-2 my-2 border border-blue-500 border-dotted"
+        type="number"
+        min="1"
+        max="100"
+        x-model="id"
+      />
+      <button
+        class="bg-gray-300 hover:bg-gray-500 p-1"
+        type="button"
+        @click="searchLade"
+      >
+        Beitrag Laden
+      </button>
+      <pre x-text="JSON.stringify(antwort, null, 2)"></pre>
+    </div>
+
+    <script>
+      function getSearchBeitrag() {
+        return {
+          apiAddress: "https://jsonplaceholder.typicode.com/posts/",
+          userID: "",
+          id: "",
+          title: "",
+          body: "",
+          antwort: null,
+
+          searchLade() {
+            console.log("Laden angeklickt");
+            fetch(this.apiAdress)
+              .then((res) => res.json())
+              .then((data) => (this.antwort = data));
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

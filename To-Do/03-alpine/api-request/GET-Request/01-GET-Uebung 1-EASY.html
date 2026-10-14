@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div x-data="getBeitrag()">
+      <h1
+        class="bg-slate-500 m-2 border border-4 font-bold text-3xl text-center"
+      >
+        Beitrag abrufen
+      </h1>
+      <button
+        class="bg-green-500 hover:bg-green-900 m-2 p-1 px-4 border border-1 border-emerald-700 rounded-full text-white text-xl text-center"
+        @click="laden()"
+      >
+        Beitrag laden
+      </button>
+      <div class="mx-2 font-bold text-xl">GET Request:</div>
+      <hr />
+      <pre class="mx-1" x-text="JSON.stringify(response, null, 2)"></pre>
+    </div>
+
+    <script>
+      function getBeitrag() {
+        return {
+          apiAdress: "https://jsonplaceholder.typicode.com/posts/1",
+          userId: "",
+          id: "",
+          title: "",
+          body: "",
+          response: null,
+
+          laden() {
+            console.log("Laden angeklickt");
+            fetch(this.apiAdress)
+              .then((res) => res.json())
+              .then((data) => (this.response = data));
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
