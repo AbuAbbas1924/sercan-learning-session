@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -10,6 +11,8 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
+class TextDaten(BaseModel):
+    text: str
 
 
 
@@ -18,6 +21,6 @@ async def test():
     return ["Text 1", "Text 2", "Text 3"]
 
 @app.post("/")
-async def textEmpfangen(daten: dict):
+async def textEmpfangen(daten: TextDaten):
     print(daten)
     return daten
