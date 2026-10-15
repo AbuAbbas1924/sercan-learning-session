@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div
+        x-data="myData()"
+        x-init="fetchData()"
+    >
+        <div x-text="JSON.stringify(apiData, null, 2)"></div>
+        <div x-text="apiData?.key1 || 'Loading...'"></div>
+        <div x-text="apiData?.key2 || 'Loading...'"></div>
+    </div>
+</body>
+<script>
+    function myData() {
+        return {
+            url: 'http://127.0.0.1:8000/',
+            apiData: null,
+            async fetchData() {
+                const response = await fetch(this.url);
+                const data = await response.json();
+                this.apiData = data;
+                // console.log(data);
+            }
+        }
+    }
+</script>
+
+</html>
