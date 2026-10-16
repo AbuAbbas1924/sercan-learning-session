@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>02-Uebung</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div x-data="selfmade()">
+      <h1 class="bg-red-200 font-bold text-2xl text-center">Uebung</h1>
+      <button
+        class="bg-red-600 hover:bg-green-600 m-4 p-2 border rounded-full"
+        @click="sirrto()"
+      >
+        GET
+      </button>
+      <pre x-text="JSON.stringify(listeGET, null, 2)"></pre>
+    </div>
+    <script>
+      function selfmade() {
+        return {
+          endpoint: "http://127.0.0.1:8000",
+          listeGET: "Druecke auf GET fuer Liste",
+
+          sirrto() {
+            fetch(this.endpoint)
+              .then((fetchResult) => fetchResult.json())
+              .then((safe) => (this.listeGET = safe));
+          },
+        };
+      }
+    </script>
+
+    <hr />
+    <div x-data="pf()">
+      <h1 class="bg-blue-200 font-bold text-2xl text-center">POST-Uebung</h1>
+      <input
+        type="text"
+        class="mt-2 border"
+        placeholder="Was wollen Sie senden?"
+        x-model="eingabe"
+      />
+      <button
+        class="bg-red-600 hover:bg-green-600 p-1 border rounded-full"
+        @click="senden()"
+      >
+        POST
+      </button>
+      <pre x-text="JSON.stringify(rfromAPI, null, 2)"></pre>
+    </div>
+    <script>
+      function pf() {
+        return {
+          endpoint: "http://127.0.0.1:8000",
+          eingabe: "",
+          rfromAPI: "Deine Eingabe wird hier erscheinen",
+
+          async senden() {
+            const response = await fetch(this.endpoint, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: this.eingabe,
+              }),
+            });
+            this.rfromAPI = await response.json();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

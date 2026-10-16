@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listen</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="p-4">
+    <div x-data="listenDaten()">
+      <h1 class="mb-4 font-bold text-3xl">Liste laden</h1>
+
+      <button
+        type="button"
+        class="bg-green-500 hover:bg-green-700 px-4 py-2 rounded-full text-white"
+        @click="laden()"
+      >
+        Laden
+      </button>
+
+      <pre
+        class="mt-4 p-3 border"
+        x-text="JSON.stringify(liste, null, 2)"
+      ></pre>
+    </div>
+    <script>
+      function listenDaten() {
+        return {
+          apiAdresse: "http://127.0.0.1:8000",
+          liste: [],
+          laden() {
+            fetch(this.apiAdresse)
+              .then((antwort) => antwort.json())
+              .then((daten) => (this.liste = daten));
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

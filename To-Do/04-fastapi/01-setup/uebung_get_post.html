@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uebung</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div x-data="geet()">
+      <h1 class="bg-blue-200 m-4 p-4 font-bold text-2xl text-center">
+        Uebung-get
+      </h1>
+      <button
+        class="bg-green-400 hover:bg-green-700 mx-4 px-2 border rounded-full"
+        @click="gf()"
+      >
+        GET
+      </button>
+      <pre class="m-4" x-text="JSON.stringify(serverantwort, null, 2)"></pre>
+    </div>
+    <hr />
+    <div x-data="sendePOST()">
+      <h1 class="bg-yellow-200 m-4 p-4 font-bold text-2xl text-center">
+        Uebung-post
+      </h1>
+      <input
+        type="text"
+        placeholder="Senden"
+        class="m-4 p-1 border border-dashed"
+        x-model="eingabe"
+      />
+      <button
+        class="bg-green-400 hover:bg-green-700 p-1 border rounded-full"
+        @click="sendInput()"
+      >
+        POST
+      </button>
+
+      <pre class="m-4" x-text="JSON.stringify(antwortVonPost, null, 2)"></pre>
+    </div>
+    <script>
+      function geet() {
+        return {
+          endpoint: "http://127.0.0.1:8000",
+          serverantwort: [],
+
+          gf() {
+            fetch(this.endpoint)
+              .then((changeResponse) => changeResponse.json())
+              .then((saveRsp) => (this.serverantwort = saveRsp));
+          },
+        };
+      }
+    </script>
+
+    <script>
+      function sendePOST() {
+        return {
+          apiAdress: "http://127.0.0.1:8000",
+          eingabe: "",
+          antwortVonPost: [],
+          // async erlaubt die Verwendung von await
+          async sendInput() {
+            console.log(this.eingabe);
+
+            // Anfrage senden, auf die Serverantwort warten und sie in response speichern
+            const response = await fetch(this.apiAdress, {
+              // POST: Daten an den Server senden
+              method: "POST",
+              // headers: Dem Server sagen: Der gesendete Inhalt ist JSON
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // Meine Eingabe im Feld "text" als JSON-Text senden
+              body: JSON.stringify({
+                text: this.eingabe,
+              }),
+            });
+            // Antwortinhalt einlesen und antwort speichern
+            this.antwortVonPost = await response.json();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
