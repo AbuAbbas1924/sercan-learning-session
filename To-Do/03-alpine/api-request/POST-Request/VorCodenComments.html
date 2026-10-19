@@ -26,9 +26,8 @@
 
       //       async hol() {
       //         const antwort = await fetch(this.endpoint);
-      //         const daten = await antwort.json();
-      //         this.apiData = daten;
-      //         // this.apiData = await antwort.json()
+      //       
+      //         this.apiData = await antwort.json()
       //       },
       //     };
       //   }
@@ -58,7 +57,7 @@
 
       <button
         class="bg-red-200 hover:bg-red-600 p-1 border rounded"
-        @click="send()"
+        @click="response = await (await fetch(endpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: eingabeName, email: eingabeEmail, body: eingabeBody}) })).json()"
       >
         POST
       </button>
@@ -75,20 +74,20 @@
           eingabeBody: "",
           response: null,
 
-          async send() {
-            const antwort = await fetch(this.endpoint, {
-              method: "POST",
-              headers: {
-                "Content-type": "application/json",
-              },
-              body: JSON.stringify({
-                name: this.eingabeName,
-                email: this.eingabeEmail,
-                body: this.eingabeBody,
-              }),
-            });
-            this.response = await antwort.json();
-          },
+        //   async send() {
+        //     const antwort = await fetch(this.endpoint, {
+        //       method: "POST",
+        //       headers: {
+        //         "Content-type": "application/json",
+        //       },
+        //       body: JSON.stringify({
+        //         name: this.eingabeName,
+        //         email: this.eingabeEmail,
+        //         body: this.eingabeBody,
+        //       }),
+        //     });
+        //     this.response = await antwort.json();
+        //   },
         };
       }
     </script>
