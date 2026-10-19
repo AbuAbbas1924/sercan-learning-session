@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div x-data="formData()">
+      <h1>POST-Request</h1>
+
+      <input
+        class="border"
+        type="text"
+        placeholder="email"
+        x-model="eingabeEmail"
+      />
+      <input
+        class="border"
+        type="text"
+        placeholder="Vorname"
+        x-model="eingabeVorname"
+      />
+      <input
+        class="border"
+        type="text"
+        placeholder="Nachname"
+        x-model="eingabeNachname"
+      />
+      <input
+        class="border"
+        type="text"
+        placeholder="img-link"
+        x-model="eingabeImg"
+      />
+      <button
+        class="bg-green-200 hover:bg-green-600 p-2 border rounded"
+        @click="sendInput()"
+      >
+        POST
+      </button>
+      <pre x-text="JSON.stringify(response, null, 2)"></pre>
+    </div>
+
+    <script>
+      function formData() {
+        return {
+          eingabeEmail: "",
+          eingabeVorname: "",
+          eingabeNachname: "",
+          eingabeImg: "",
+          apiAdress: "https://reqres.in/api/users",
+          response: null,
+
+          async sendInput() {
+            const antwort = await fetch(this.apiAdress, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: this.eingabeEmail,
+                first_name: this.eingabeVorname,
+                last_name: this.eingabeNachname,
+                avatar: this.eingabeImg,
+              }),
+            });
+
+            this.response = await antwort.json();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

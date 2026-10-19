@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div x-data="{apiData:{}}">
+      <h1>GET-Request</h1>
+      <button
+        class="bg-green-200 hover:bg-green-600 p-1 border rounded"
+        @click="apiData= await (await fetch('https://jsonplaceholder.typicode.com/comments')).json()"
+      >
+        GET
+      </button>
+      <pre x-text="JSON.stringify(apiData,null,2)"></pre>
+    </div>
+    <script>
+      //   function formData() {
+      //     return {
+      //       endpoint: "https://jsonplaceholder.typicode.com/comments",
+      //       apiData: null,
+
+      //       async hol() {
+      //         const antwort = await fetch(this.endpoint);
+      //         const daten = await antwort.json();
+      //         this.apiData = daten;
+      //         // this.apiData = await antwort.json()
+      //       },
+      //     };
+      //   }
+    </script>
+    <hr />
+    <div x-data="formData2()">
+      <h1>POST-Request</h1>
+      <input
+        type="text"
+        class="border"
+        x-model="eingabeName"
+        placeholder="Name"
+      />
+      <input
+        type="email"
+        class="border"
+        x-model="eingabeEmail"
+        placeholder="E-mail"
+      />
+      <textarea
+        class="border"
+        name="body"
+        id="body"
+        x-model="eingabeBody"
+        placeholder="Body"
+      ></textarea>
+
+      <button
+        class="bg-red-200 hover:bg-red-600 p-1 border rounded"
+        @click="send()"
+      >
+        POST
+      </button>
+
+      <pre x-text="JSON.stringify(response,null,2)"></pre>
+    </div>
+
+    <script>
+      function formData2() {
+        return {
+          endpoint: "https://jsonplaceholder.typicode.com/comments",
+          eingabeName: "",
+          eingabeEmail: "",
+          eingabeBody: "",
+          response: null,
+
+          async send() {
+            const antwort = await fetch(this.endpoint, {
+              method: "POST",
+              headers: {
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({
+                name: this.eingabeName,
+                email: this.eingabeEmail,
+                body: this.eingabeBody,
+              }),
+            });
+            this.response = await antwort.json();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
