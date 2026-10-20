@@ -37,7 +37,9 @@
       <!-- Zeigt alle hinzugefügten Aufgaben an. -->
       <ul class="mt-4">
         <template x-for="aufgabe in aufgaben" :key="aufgabe.id">
-          <li class="bg-gray-100 mb-2 p-2 rounded">
+          <li
+            class="flex justify-between items-center gap-3 bg-gray-100 mb-2 p-2 rounded"
+          >
             <label class="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -50,6 +52,14 @@
                 :class="{ 'line-through text-gray-500': aufgabe.erledigt }"
               ></span>
             </label>
+
+            <button
+              type="button"
+              @click="loeschen(aufgabe)"
+              class="text-red-600 hover:underline"
+            >
+              Löschen
+            </button>
           </li>
         </template>
       </ul>
@@ -116,6 +126,30 @@
               console.error(error);
             } finally {
               checkbox.disabled = false;
+            }
+          },
+          async loeschen(aufgabe) {
+            try {
+              const response = await fetch(
+                "http://127.0.0.1:8000/aufgaben/" + aufgabe.id,
+                {
+                  method: "DELETE",
+                },
+              );
+
+              if (!response.ok) {
+                throw new Error("Löschen fehlgeschlagen");
+              }
+
+              // Nur die anderen Aufgaben in der sichtbaren Liste behalten.
+              this.aufgaben = this.aufgaben.filter(
+                (eintrag) => eintrag.id !== aufgabe.id,
+              );
+
+              this.apiNachricht = "Aufgabe gelöscht.";
+            } catch (error) {
+              this.apiNachricht = "Die Aufgabe konnte nicht gelöscht werden.";
+              console.error(error);
             }
           },
           async hinzufuegen() {

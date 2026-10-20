@@ -58,7 +58,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3000",
     ],
-    allow_methods=["GET", "POST", "PATCH"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["Content-Type"],
 )
 
@@ -121,3 +121,25 @@ async def aufgabe_status_aendern(
     await session.refresh(aufgabe)
 
     return aufgabe
+
+@app.delete("/aufgaben/{aufgabe_id}")
+async def aufgabe_loeschen(
+    aufgabe_id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    # Die Aufgabe anhand ihrer ID suchen.
+    aufgabe = await session.get(Aufgabe, aufgabe_id)
+
+    if aufgabe is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Aufgabe nicht gefunden",
+        )
+
+    # Die Aufgabe zum Löschen vormerken.
+    await session.delete(aufgabe)
+
+    # Die Löschung dauerhaft speichern.
+    await session.commit()
+
+    return {"nachricht": "Aufgabe gelöscht."}
