@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
+from typing import Annotated
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import SQLModel, Field, select
+from sqlmodel import Field, SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 
@@ -13,9 +14,11 @@ class Aufgabe(SQLModel, table=True):
     titel: str
     erledigt: bool = False
 
+
 # Beschreibt die Daten, die beim Erstellen gesendet werden.
 class AufgabeErstellen(SQLModel):
     titel: str = Field(min_length=1)
+
 
 # Eingabedaten zum Ändern des Erledigt-Status.
 class AufgabeStatus(SQLModel):
@@ -51,7 +54,7 @@ async def get_session():
         yield session
 
 
-# Unsere lokale Oberfläche darf API-Antworten lesen.
+# Erlaubt unserer lokalen Oberfläche den Zugriff auf die API.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -71,7 +74,9 @@ async def start():
 
 # Alle Aufgaben aus der Datenbank abrufen.
 @app.get("/aufgaben")
-async def aufgaben_lesen(session: AsyncSession = Depends(get_session)):
+async def aufgaben_lesen(
+    session: Annotated[AsyncSession, Depends(get_session)],
+):
     # Alle Aufgaben abfragen, nach ID sortiert.
     abfrage = select(Aufgabe).order_by(Aufgabe.id)
 
@@ -81,10 +86,12 @@ async def aufgaben_lesen(session: AsyncSession = Depends(get_session)):
     # Alle gefundenen Aufgaben zurückgeben.
     return ergebnis.all()
 
+
+# Eine neue Aufgabe speichern.
 @app.post("/aufgaben", status_code=201)
 async def aufgabe_erstellen(
     daten: AufgabeErstellen,
-    session: AsyncSession = Depends(get_session),
+    session: Annotated[AsyncSession, Depends(get_session)],
 ):
     # Aus den empfangenen Daten eine neue Aufgabe erstellen.
     neue_aufgabe = Aufgabe(titel=daten.titel)
@@ -95,16 +102,18 @@ async def aufgabe_erstellen(
     # Die Änderung dauerhaft in der Datenbank speichern.
     await session.commit()
 
-    # Die von SQLite vergebene ID und die gespeicherten Werte laden.
+    # Die von SQLite vergebene ID und gespeicherten Werte laden.
     await session.refresh(neue_aufgabe)
 
     return neue_aufgabe
 
+
+# Den Erledigt-Status einer Aufgabe ändern.
 @app.patch("/aufgaben/{aufgabe_id}")
 async def aufgabe_status_aendern(
     aufgabe_id: int,
     daten: AufgabeStatus,
-    session: AsyncSession = Depends(get_session),
+    session: Annotated[AsyncSession, Depends(get_session)],
 ):
     # Die Aufgabe anhand ihrer ID suchen.
     aufgabe = await session.get(Aufgabe, aufgabe_id)
@@ -122,10 +131,12 @@ async def aufgabe_status_aendern(
 
     return aufgabe
 
+
+# Eine Aufgabe dauerhaft löschen.
 @app.delete("/aufgaben/{aufgabe_id}")
 async def aufgabe_loeschen(
     aufgabe_id: int,
-    session: AsyncSession = Depends(get_session),
+    session: Annotated[AsyncSession, Depends(get_session)],
 ):
     # Die Aufgabe anhand ihrer ID suchen.
     aufgabe = await session.get(Aufgabe, aufgabe_id)
