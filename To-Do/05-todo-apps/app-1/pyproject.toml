@@ -10,6 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "aiosqlite>=0.22.1",
     "fastapi>=0.151.0",
+    "sqlalchemy[asyncio]>=2.1.5",
     "sqlmodel>=0.0.48",
     "uvicorn>=0.54.0",
 ]
