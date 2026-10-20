@@ -13,6 +13,7 @@
     <!-- x-data stellt unsere Daten innerhalb von main bereit. -->
     <main x-data="todoApp()" class="bg-white mx-auto p-6 rounded-lg max-w-lg">
       <h1 class="mb-6 font-bold text-3xl">Meine To-do-App</h1>
+      <p class="mb-4 text-gray-600" x-text="apiNachricht"></p>
 
       <label for="aufgabe" class="block mb-2">Neue Aufgabe:</label>
 
@@ -46,6 +47,24 @@
         return {
           neueAufgabe: "",
           aufgaben: [],
+          apiNachricht: "",
+
+          async init() {
+            try {
+              const response = await fetch("http://127.0.0.1:8000/");
+
+              if (!response.ok) {
+                throw new Error("API-Anfrage fehlgeschlagen");
+              }
+
+              const data = await response.json();
+              this.apiNachricht = data.nachricht;
+            } catch (error) {
+              this.apiNachricht =
+                "Die API ist nicht erreichbar oder meldet einen Fehler.";
+              console.error(error);
+            }
+          },
 
           hinzufuegen() {
             const text = this.neueAufgabe.trim();
