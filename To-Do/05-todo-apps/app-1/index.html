@@ -36,8 +36,8 @@
 
       <!-- Zeigt alle hinzugefügten Aufgaben an. -->
       <ul class="mt-4">
-        <template x-for="(aufgabe, index) in aufgaben" :key="index">
-          <li class="bg-gray-100 mb-2 p-2 rounded" x-text="aufgabe"></li>
+        <template x-for="aufgabe in aufgaben" :key="aufgabe.id">
+          <li class="bg-gray-100 mb-2 p-2 rounded" x-text="aufgabe.titel"></li>
         </template>
       </ul>
     </main>
@@ -50,31 +50,57 @@
           apiNachricht: "",
 
           async init() {
+            await this.laden();
+          },
+
+          async laden() {
             try {
-              const response = await fetch("http://127.0.0.1:8000/");
+              const response = await fetch("http://127.0.0.1:8000/aufgaben");
 
               if (!response.ok) {
-                throw new Error("API-Anfrage fehlgeschlagen");
+                throw new Error("Laden fehlgeschlagen");
               }
 
-              const data = await response.json();
-              this.apiNachricht = data.nachricht;
+              this.aufgaben = await response.json();
+              this.apiNachricht = "Aufgaben geladen.";
             } catch (error) {
-              this.apiNachricht =
-                "Die API ist nicht erreichbar oder meldet einen Fehler.";
+              this.apiNachricht = "Die Aufgaben konnten nicht geladen werden.";
               console.error(error);
             }
           },
 
-          hinzufuegen() {
+          async hinzufuegen() {
             const text = this.neueAufgabe.trim();
 
             if (text === "") {
               return;
             }
 
-            this.aufgaben.push(text);
-            this.neueAufgabe = "";
+            try {
+              const response = await fetch("http://127.0.0.1:8000/aufgaben", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  titel: text,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Speichern fehlgeschlagen");
+              }
+
+              const gespeicherteAufgabe = await response.json();
+
+              this.aufgaben.push(gespeicherteAufgabe);
+              this.neueAufgabe = "";
+              this.apiNachricht = "Aufgabe gespeichert.";
+            } catch (error) {
+              this.apiNachricht =
+                "Die Aufgabe konnte nicht gespeichert werden.";
+              console.error(error);
+            }
           },
         };
       }
