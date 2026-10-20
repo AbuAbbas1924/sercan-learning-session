@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App 2 – Mein Aufgabenboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x" defer></script>
+  </head>
+
+  <body class="bg-slate-950 p-4 sm:p-8 min-h-screen text-slate-100">
+    <main x-data="todoApp()" class="mx-auto max-w-3xl">
+      <header class="mb-8">
+        <p class="mb-2 font-bold text-teal-400 text-sm uppercase tracking-widest">
+          App 2 · Aufgabenboard
+        </p>
+        <h1 class="font-bold text-4xl">Dein Tag. Deine Aufgaben.</h1>
+        <p class="mt-3 text-slate-400">
+          Behalte den Überblick und erledige einen Schritt nach dem anderen.
+        </p>
+      </header>
+
+      <!-- Die Zähler werden aus unseren Aufgaben berechnet. -->
+      <section class="gap-3 grid grid-cols-3 mb-6">
+        <div class="bg-slate-800 p-4 rounded-xl">
+          <p class="text-slate-400 text-sm">Gesamt</p>
+          <p class="mt-2 font-bold text-3xl" x-text="aufgaben.length"></p>
+        </div>
+
+        <div class="bg-slate-800 p-4 rounded-xl">
+          <p class="text-slate-400 text-sm">Offen</p>
+          <p class="mt-2 font-bold text-amber-400 text-3xl" x-text="offen"></p>
+        </div>
+
+        <div class="bg-slate-800 p-4 rounded-xl">
+          <p class="text-slate-400 text-sm">Erledigt</p>
+          <p class="mt-2 font-bold text-teal-400 text-3xl" x-text="erledigt"></p>
+        </div>
+      </section>
+
+      <section class="bg-slate-900 p-5 border border-slate-700 rounded-2xl">
+        <!-- Ein Formular erlaubt auch das Absenden mit Enter. -->
+        <form @submit.prevent="hinzufuegen()" class="mb-6">
+          <label for="neue-aufgabe" class="block mb-2 font-medium">
+            Was steht an?
+          </label>
+
+          <div class="flex sm:flex-row flex-col gap-3">
+            <input
+              id="neue-aufgabe"
+              type="text"
+              x-model="neueAufgabe"
+              placeholder="Neue Aufgabe eingeben"
+              required
+              class="flex-1 bg-slate-800 p-3 border border-slate-600 rounded-lg min-w-0"
+            />
+
+            <button
+              type="submit"
+              :disabled="speichert"
+              class="bg-teal-400 hover:bg-teal-300 disabled:opacity-50 px-5 py-3 rounded-lg font-bold text-slate-950"
+              x-text="speichert ? 'Speichert …' : 'Hinzufügen'"
+            ></button>
+          </div>
+        </form>
+
+        <label for="suche" class="block mb-2 text-slate-400 text-sm">
+          Aufgaben durchsuchen
+        </label>
+        <input
+          id="suche"
+          type="search"
+          x-model="suche"
+          placeholder="Suchbegriff …"
+          class="bg-slate-800 mb-4 p-3 border border-slate-600 rounded-lg w-full"
+        />
+
+        <!-- Die Buttons ändern nur den ausgewählten Filter. -->
+        <div class="flex flex-wrap gap-2 mb-5">
+          <template x-for="option in ['Alle', 'Offen', 'Erledigt']" :key="option">
+            <button
+              type="button"
+              @click="filter = option"
+              :aria-pressed="filter === option"
+              :class="filter === option
+                ? 'bg-teal-400 text-slate-950'
+                : 'bg-slate-800 text-slate-300'"
+              class="px-4 py-2 rounded-lg font-medium"
+              x-text="option"
+            ></button>
+          </template>
+        </div>
+
+        <p
+          class="mb-4 text-slate-400 text-sm"
+          role="status"
+          x-text="nachricht"
+        ></p>
+
+        <p
+          x-show="sichtbareAufgaben.length === 0"
+          class="py-8 text-slate-400 text-center"
+        >
+          Keine passenden Aufgaben vorhanden.
+        </p>
+
+        <ul class="space-y-3">
+          <template x-for="aufgabe in sichtbareAufgaben" :key="aufgabe.id">
+            <li class="flex justify-between items-center gap-4 bg-slate-800 p-4 rounded-xl">
+              <label class="flex items-center gap-3 min-w-0">
+                <input
+                  type="checkbox"
+                  :checked="aufgabe.erledigt"
+                  :disabled="aktiveId === aufgabe.id"
+                  @change="statusAendern(aufgabe, $event)"
+                  class="w-5 h-5 accent-teal-400 shrink-0"
+                />
+                <span
+                  class="break-words"
+                  :class="{ 'line-through text-slate-500': aufgabe.erledigt }"
+                  x-text="aufgabe.titel"
+                ></span>
+              </label>
+
+              <button
+                type="button"
+                @click="loeschen(aufgabe)"
+                :disabled="aktiveId === aufgabe.id"
+                class="disabled:opacity-50 text-rose-400 text-sm hover:underline shrink-0"
+              >
+                Löschen
+              </button>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </main>
+
+    <script>
+      function todoApp() {
+        return {
+          api: "http://127.0.0.1:8000/aufgaben",
+          neueAufgabe: "",
+          aufgaben: [],
+          suche: "",
+          filter: "Alle",
+          nachricht: "",
+          speichert: false,
+          aktiveId: null,
+
+          // Getter berechnen Werte aus den vorhandenen Daten.
+          get offen() {
+            return this.aufgaben.filter((aufgabe) => !aufgabe.erledigt).length;
+          },
+
+          get erledigt() {
+            return this.aufgaben.filter((aufgabe) => aufgabe.erledigt).length;
+          },
+
+          get sichtbareAufgaben() {
+            const suchtext = this.suche.trim().toLowerCase();
+
+            return this.aufgaben.filter((aufgabe) => {
+              const passtZurSuche = aufgabe.titel
+                .toLowerCase()
+                .includes(suchtext);
+
+              const passtZumFilter =
+                this.filter === "Alle" ||
+                (this.filter === "Offen" && !aufgabe.erledigt) ||
+                (this.filter === "Erledigt" && aufgabe.erledigt);
+
+              return passtZurSuche && passtZumFilter;
+            });
+          },
+
+          async init() {
+            await this.laden();
+          },
+
+          async laden() {
+            try {
+              const response = await fetch(this.api);
+
+              if (!response.ok) {
+                throw new Error("Laden fehlgeschlagen");
+              }
+
+              this.aufgaben = await response.json();
+              this.nachricht = "Deine Aufgaben sind aktuell.";
+            } catch (error) {
+              this.nachricht = "Aufgaben konnten nicht geladen werden.";
+              console.error(error);
+            }
+          },
+
+          async hinzufuegen() {
+            const text = this.neueAufgabe.trim();
+
+            if (text === "" || this.speichert) {
+              return;
+            }
+
+            this.speichert = true;
+
+            try {
+              const response = await fetch(this.api, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ titel: text }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Speichern fehlgeschlagen");
+              }
+
+              const aufgabe = await response.json();
+              this.aufgaben.push(aufgabe);
+              this.neueAufgabe = "";
+              this.nachricht = "Neue Aufgabe gespeichert.";
+            } catch (error) {
+              this.nachricht = "Aufgabe konnte nicht gespeichert werden.";
+              console.error(error);
+            } finally {
+              this.speichert = false;
+            }
+          },
+
+          async statusAendern(aufgabe, event) {
+            const checkbox = event.target;
+
+            if (this.aktiveId !== null) {
+              checkbox.checked = aufgabe.erledigt;
+              return;
+            }
+
+            this.aktiveId = aufgabe.id;
+
+            try {
+              const response = await fetch(this.api + "/" + aufgabe.id, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ erledigt: checkbox.checked }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Statusänderung fehlgeschlagen");
+              }
+
+              const gespeichert = await response.json();
+              aufgabe.erledigt = gespeichert.erledigt;
+              this.nachricht = "Status gespeichert.";
+            } catch (error) {
+              checkbox.checked = aufgabe.erledigt;
+              this.nachricht = "Status konnte nicht gespeichert werden.";
+              console.error(error);
+            } finally {
+              this.aktiveId = null;
+            }
+          },
+
+          async loeschen(aufgabe) {
+            if (this.aktiveId !== null) {
+              return;
+            }
+
+            this.aktiveId = aufgabe.id;
+
+            try {
+              const response = await fetch(this.api + "/" + aufgabe.id, {
+                method: "DELETE",
+              });
+
+              if (!response.ok) {
+                throw new Error("Löschen fehlgeschlagen");
+              }
+
+              this.aufgaben = this.aufgaben.filter(
+                (eintrag) => eintrag.id !== aufgabe.id,
+              );
+              this.nachricht = "Aufgabe gelöscht.";
+            } catch (error) {
+              this.nachricht = "Aufgabe konnte nicht gelöscht werden.";
+              console.error(error);
+            } finally {
+              this.aktiveId = null;
+            }
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
