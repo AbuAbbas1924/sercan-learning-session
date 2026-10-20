@@ -1,0 +1,649 @@
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App 3 – Projektmanagement-Board</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-950 p-4 sm:p-8 min-h-screen text-slate-100">
+    <main x-data="kanbanApp()" x-cloak class="mx-auto max-w-7xl">
+
+      <!-- Überschrift -->
+      <header class="mb-8">
+        <p class="mb-2 font-bold text-teal-400 text-sm uppercase tracking-widest">
+          App 3 · Projektmanagement
+        </p>
+        <h1 class="font-bold text-4xl">Mein Kanban-Board</h1>
+        <p class="mt-3 text-slate-400">
+          Plane, priorisiere und verwalte deine Aufgaben.
+        </p>
+      </header>
+
+      <!-- Statistiken -->
+      <section class="gap-3 grid grid-cols-2 md:grid-cols-4 mb-6">
+        <template x-for="karte in [
+          { name: 'Gesamt', wert: aufgaben.length, farbe: 'text-white' },
+          { name: 'Offen', wert: anzahl('offen'), farbe: 'text-amber-400' },
+          { name: 'In Arbeit', wert: anzahl('in_arbeit'), farbe: 'text-blue-400' },
+          { name: 'Erledigt', wert: anzahl('erledigt'), farbe: 'text-teal-400' }
+        ]" :key="karte.name">
+          <div class="bg-slate-800 p-4 rounded-xl">
+            <p class="text-slate-400 text-sm" x-text="karte.name"></p>
+            <p
+              class="mt-2 font-bold text-3xl"
+              :class="karte.farbe"
+              x-text="karte.wert"
+            ></p>
+          </div>
+        </template>
+      </section>
+
+      <!-- Neue Aufgabe -->
+      <section class="bg-slate-900 mb-6 p-5 border border-slate-700 rounded-2xl">
+        <h2 class="mb-4 font-bold text-xl">Neue Aufgabe erstellen</h2>
+
+        <form @submit.prevent="hinzufuegen()" class="space-y-4">
+          <div>
+            <label for="titel" class="block mb-2 text-sm">Aufgabe</label>
+            <input
+              id="titel"
+              type="text"
+              x-model="neueAufgabe"
+              placeholder="z. B. FastAPI lernen"
+              required
+              class="bg-slate-800 p-3 border border-slate-600 rounded-lg w-full"
+            />
+          </div>
+
+          <div class="gap-4 grid sm:grid-cols-2">
+            <div>
+              <label for="prioritaet" class="block mb-2 text-sm">
+                Priorität
+              </label>
+              <select
+                id="prioritaet"
+                x-model="neuePrioritaet"
+                class="bg-slate-800 p-3 border border-slate-600 rounded-lg w-full"
+              >
+                <option value="niedrig">Niedrig</option>
+                <option value="mittel">Mittel</option>
+                <option value="hoch">Hoch</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="datum" class="block mb-2 text-sm">
+                Fälligkeitsdatum
+              </label>
+              <input
+                id="datum"
+                type="date"
+                x-model="neuesDatum"
+                class="bg-slate-800 p-3 border border-slate-600 rounded-lg w-full"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="beschaeftigt"
+            class="bg-teal-400 hover:bg-teal-300 disabled:opacity-50 px-6 py-3 rounded-lg font-bold text-slate-950"
+            x-text="beschaeftigt ? 'Bitte warten ...' : '+ Aufgabe hinzufügen'"
+          ></button>
+        </form>
+
+        <p class="mt-3 text-slate-400 text-sm" role="status" x-text="nachricht"></p>
+      </section>
+
+      <!-- Suche und Sortierung -->
+      <section class="gap-3 grid sm:grid-cols-2 mb-6">
+        <div>
+          <label for="suche" class="block mb-2 text-slate-400 text-sm">
+            Aufgaben durchsuchen
+          </label>
+          <input
+            id="suche"
+            type="search"
+            x-model="suche"
+            placeholder="Suchbegriff eingeben ..."
+            class="bg-slate-800 p-3 border border-slate-700 rounded-lg w-full"
+          />
+        </div>
+
+        <div>
+          <label for="sortierung" class="block mb-2 text-slate-400 text-sm">
+            Aufgaben sortieren
+          </label>
+          <select
+            id="sortierung"
+            x-model="sortierung"
+            class="bg-slate-800 p-3 border border-slate-700 rounded-lg w-full"
+          >
+            <option value="neu">Erstellungsreihenfolge</option>
+            <option value="prioritaet">Priorität: Hoch zuerst</option>
+            <option value="datum">Fälligkeitsdatum: Früh zuerst</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Kanban-Board -->
+      <section class="gap-4 grid grid-cols-1 md:grid-cols-3">
+
+        <template x-for="spalte in spalten" :key="spalte.status">
+          <div
+            class="bg-slate-900 p-4 border border-slate-700 rounded-2xl min-h-96 transition-colors"
+            :class="{ 'border-teal-400 bg-slate-800': zielStatus === spalte.status }"
+            @dragover.prevent="zielStatus = spalte.status"
+            @drop.prevent="ablegen(spalte.status)"
+          >
+            <!-- Spaltenüberschrift -->
+            <div class="flex justify-between items-center mb-5">
+              <h2
+                class="font-bold text-lg"
+                :class="{
+                  'text-amber-400': spalte.status === 'offen',
+                  'text-blue-400': spalte.status === 'in_arbeit',
+                  'text-teal-400': spalte.status === 'erledigt'
+                }"
+                x-text="spalte.name"
+              ></h2>
+
+              <span
+                class="bg-slate-800 px-3 py-1 rounded-full text-sm"
+                x-text="anzahl(spalte.status)"
+              ></span>
+            </div>
+
+            <p
+              x-show="aufgabenInSpalte(spalte.status).length === 0"
+              class="py-8 text-slate-500 text-sm text-center"
+            >
+              Keine Aufgaben vorhanden.
+            </p>
+
+            <ul class="space-y-3">
+              <template
+                x-for="aufgabe in aufgabenInSpalte(spalte.status)"
+                :key="aufgabe.id"
+              >
+                <li
+                  class="bg-slate-800 p-4 border rounded-xl"
+                  :class="istUeberfaellig(aufgabe)
+                    ? 'border-rose-500'
+                    : 'border-slate-700'"
+                  :draggable="bearbeitenId !== aufgabe.id && !beschaeftigt"
+                  @dragstart="ziehen($event, aufgabe)"
+                  @dragend="ziehenBeenden()"
+                >
+
+                  <!-- Normale Aufgabenansicht -->
+                  <template x-if="bearbeitenId !== aufgabe.id">
+                    <div>
+                      <p
+                        class="mb-3 font-semibold break-words"
+                        x-text="aufgabe.titel"
+                      ></p>
+
+                      <!-- Priorität -->
+                      <span
+                        class="inline-block px-3 py-1 rounded-full font-bold text-xs"
+                        :class="{
+                          'bg-green-900 text-green-300': aufgabe.prioritaet === 'niedrig',
+                          'bg-amber-900 text-amber-300': aufgabe.prioritaet === 'mittel',
+                          'bg-rose-900 text-rose-300': aufgabe.prioritaet === 'hoch'
+                        }"
+                        x-text="aufgabe.prioritaet"
+                      ></span>
+
+                      <!-- Datum -->
+                      <p
+                        x-show="aufgabe.faellig_am"
+                        class="mt-3 text-sm"
+                        :class="istUeberfaellig(aufgabe)
+                          ? 'font-bold text-rose-400'
+                          : 'text-slate-400'"
+                      >
+                        <span x-text="istUeberfaellig(aufgabe) ? 'Überfällig: ' : 'Fällig: '"></span>
+                        <span x-text="datumAnzeigen(aufgabe.faellig_am)"></span>
+                      </p>
+
+                      <!-- Aktionsbuttons -->
+                      <div class="flex flex-wrap gap-2 mt-4">
+                        <button
+                          type="button"
+                          x-show="aufgabe.status !== 'offen'"
+                          @click="zurueck(aufgabe)"
+                          :disabled="beschaeftigt"
+                          class="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 px-3 py-2 rounded-lg text-xs"
+                        >
+                          ← Zurück
+                        </button>
+
+                        <button
+                          type="button"
+                          x-show="aufgabe.status !== 'erledigt'"
+                          @click="weiter(aufgabe)"
+                          :disabled="beschaeftigt"
+                          class="bg-teal-400 hover:bg-teal-300 disabled:opacity-50 px-3 py-2 rounded-lg font-bold text-slate-950 text-xs"
+                        >
+                          Weiter →
+                        </button>
+
+                        <button
+                          type="button"
+                          @click="bearbeitungStarten(aufgabe)"
+                          :disabled="beschaeftigt"
+                          class="bg-blue-900 disabled:opacity-50 px-3 py-2 rounded-lg text-blue-200 text-xs"
+                        >
+                          Bearbeiten
+                        </button>
+
+                        <button
+                          type="button"
+                          @click="loeschen(aufgabe)"
+                          :disabled="beschaeftigt"
+                          class="bg-rose-900 disabled:opacity-50 px-3 py-2 rounded-lg text-rose-200 text-xs"
+                        >
+                          Löschen
+                        </button>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- Bearbeitungsformular -->
+                  <template x-if="bearbeitenId === aufgabe.id">
+                    <form @submit.prevent="bearbeitungSpeichern(aufgabe)" class="space-y-3">
+                      <label class="block text-sm">
+                        Titel
+                        <input
+                          type="text"
+                          x-model="bearbeitung.titel"
+                          required
+                          class="bg-slate-900 mt-1 p-2 border border-slate-600 rounded-lg w-full"
+                        />
+                      </label>
+
+                      <label class="block text-sm">
+                        Priorität
+                        <select
+                          x-model="bearbeitung.prioritaet"
+                          class="bg-slate-900 mt-1 p-2 border border-slate-600 rounded-lg w-full"
+                        >
+                          <option value="niedrig">Niedrig</option>
+                          <option value="mittel">Mittel</option>
+                          <option value="hoch">Hoch</option>
+                        </select>
+                      </label>
+
+                      <label class="block text-sm">
+                        Fälligkeitsdatum
+                        <input
+                          type="date"
+                          x-model="bearbeitung.faellig_am"
+                          class="bg-slate-900 mt-1 p-2 border border-slate-600 rounded-lg w-full"
+                        />
+                      </label>
+
+                      <div class="flex gap-2">
+                        <button
+                          type="submit"
+                          :disabled="beschaeftigt"
+                          class="bg-teal-400 disabled:opacity-50 px-3 py-2 rounded-lg font-bold text-slate-950 text-xs"
+                        >
+                          Speichern
+                        </button>
+
+                        <button
+                          type="button"
+                          @click="bearbeitenId = null"
+                          :disabled="beschaeftigt"
+                          class="bg-slate-700 disabled:opacity-50 px-3 py-2 rounded-lg text-xs"
+                        >
+                          Abbrechen
+                        </button>
+                      </div>
+                    </form>
+                  </template>
+
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+      </section>
+
+      <p class="mt-5 text-slate-500 text-sm text-center">
+        Tipp: Ziehe Aufgaben mit der Maus in eine andere Spalte.
+      </p>
+    </main>
+
+    <script>
+      function kanbanApp() {
+        return {
+          api: "http://127.0.0.1:8000/aufgaben",
+
+          aufgaben: [],
+          neueAufgabe: "",
+          neuePrioritaet: "mittel",
+          neuesDatum: "",
+
+          suche: "",
+          sortierung: "neu",
+          nachricht: "",
+          beschaeftigt: false,
+
+          bearbeitenId: null,
+          bearbeitung: {},
+
+          gezogeneId: null,
+          zielStatus: null,
+
+          spalten: [
+            { name: "Offen", status: "offen" },
+            { name: "In Arbeit", status: "in_arbeit" },
+            { name: "Erledigt", status: "erledigt" },
+          ],
+
+          // Aufgaben pro Status zählen.
+          anzahl(status) {
+            return this.aufgaben.filter(
+              (aufgabe) => aufgabe.status === status
+            ).length;
+          },
+
+          // Aufgaben filtern und sortieren.
+          aufgabenInSpalte(status) {
+            const suchtext = this.suche.trim().toLowerCase();
+
+            const ergebnis = this.aufgaben.filter((aufgabe) => {
+              return (
+                aufgabe.status === status &&
+                aufgabe.titel.toLowerCase().includes(suchtext)
+              );
+            });
+
+            if (this.sortierung === "prioritaet") {
+              const reihenfolge = {
+                hoch: 0,
+                mittel: 1,
+                niedrig: 2,
+              };
+
+              ergebnis.sort(
+                (a, b) =>
+                  reihenfolge[a.prioritaet] -
+                  reihenfolge[b.prioritaet]
+              );
+            }
+
+            if (this.sortierung === "datum") {
+              ergebnis.sort((a, b) => {
+                const datumA = a.faellig_am || "9999-12-31";
+                const datumB = b.faellig_am || "9999-12-31";
+                return datumA.localeCompare(datumB);
+              });
+            }
+
+            if (this.sortierung === "neu") {
+              ergebnis.sort((a, b) => a.id - b.id);
+            }
+
+            return ergebnis;
+          },
+
+          // Datum deutsch darstellen.
+          datumAnzeigen(datum) {
+            if (!datum) return "";
+
+            return new Date(datum + "T00:00:00")
+              .toLocaleDateString("de-DE");
+          },
+
+          // Prüfen, ob eine Aufgabe überfällig ist.
+          istUeberfaellig(aufgabe) {
+            if (!aufgabe.faellig_am || aufgabe.status === "erledigt") {
+              return false;
+            }
+
+            const heute = new Date();
+            const lokalesDatum =
+              heute.getFullYear() + "-" +
+              String(heute.getMonth() + 1).padStart(2, "0") + "-" +
+              String(heute.getDate()).padStart(2, "0");
+
+            return aufgabe.faellig_am < lokalesDatum;
+          },
+
+          // Beim Start Daten laden.
+          async init() {
+            await this.laden();
+          },
+
+          // GET: Aufgaben abrufen.
+          async laden() {
+            try {
+              const response = await fetch(this.api);
+
+              if (!response.ok) {
+                throw new Error("Laden fehlgeschlagen");
+              }
+
+              this.aufgaben = await response.json();
+              this.nachricht = "Aufgaben geladen.";
+            } catch (error) {
+              this.nachricht = "Aufgaben konnten nicht geladen werden.";
+              console.error(error);
+            }
+          },
+
+          // POST: Aufgabe erstellen.
+          async hinzufuegen() {
+            const titel = this.neueAufgabe.trim();
+
+            if (!titel || this.beschaeftigt) return;
+
+            this.beschaeftigt = true;
+
+            try {
+              const response = await fetch(this.api, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  titel: titel,
+                  prioritaet: this.neuePrioritaet,
+                  faellig_am: this.neuesDatum || null,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Speichern fehlgeschlagen");
+              }
+
+              const aufgabe = await response.json();
+
+              this.aufgaben.push(aufgabe);
+              this.neueAufgabe = "";
+              this.neuePrioritaet = "mittel";
+              this.neuesDatum = "";
+              this.nachricht = "Aufgabe erstellt.";
+            } catch (error) {
+              this.nachricht = "Aufgabe konnte nicht erstellt werden.";
+              console.error(error);
+            } finally {
+              this.beschaeftigt = false;
+            }
+          },
+
+          // PATCH: Beliebige Aufgabenfelder ändern.
+          async aktualisieren(aufgabe, aenderungen) {
+            if (this.beschaeftigt) return false;
+
+            this.beschaeftigt = true;
+
+            try {
+              const response = await fetch(
+                this.api + "/" + aufgabe.id,
+                {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(aenderungen),
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error("Änderung fehlgeschlagen");
+              }
+
+              const gespeichert = await response.json();
+
+              this.aufgaben = this.aufgaben.map((eintrag) =>
+                eintrag.id === aufgabe.id ? gespeichert : eintrag
+              );
+
+              this.nachricht = "Änderungen gespeichert.";
+              return true;
+            } catch (error) {
+              this.nachricht = "Änderungen konnten nicht gespeichert werden.";
+              console.error(error);
+              return false;
+            } finally {
+              this.beschaeftigt = false;
+            }
+          },
+
+          // Bearbeitungsformular öffnen.
+          bearbeitungStarten(aufgabe) {
+            this.bearbeitenId = aufgabe.id;
+
+            this.bearbeitung = {
+              titel: aufgabe.titel,
+              prioritaet: aufgabe.prioritaet,
+              faellig_am: aufgabe.faellig_am || "",
+            };
+          },
+
+          // Bearbeitete Daten speichern.
+          async bearbeitungSpeichern(aufgabe) {
+            const titel = this.bearbeitung.titel.trim();
+
+            if (!titel) return;
+
+            const erfolgreich = await this.aktualisieren(aufgabe, {
+              titel: titel,
+              prioritaet: this.bearbeitung.prioritaet,
+              faellig_am: this.bearbeitung.faellig_am || null,
+            });
+
+            if (erfolgreich) {
+              this.bearbeitenId = null;
+            }
+          },
+
+          // Aufgabe eine Spalte weiterbewegen.
+          async weiter(aufgabe) {
+            if (aufgabe.status === "offen") {
+              await this.aktualisieren(aufgabe, {
+                status: "in_arbeit",
+              });
+            } else if (aufgabe.status === "in_arbeit") {
+              await this.aktualisieren(aufgabe, {
+                status: "erledigt",
+              });
+            }
+          },
+
+          // Aufgabe eine Spalte zurückbewegen.
+          async zurueck(aufgabe) {
+            if (aufgabe.status === "erledigt") {
+              await this.aktualisieren(aufgabe, {
+                status: "in_arbeit",
+              });
+            } else if (aufgabe.status === "in_arbeit") {
+              await this.aktualisieren(aufgabe, {
+                status: "offen",
+              });
+            }
+          },
+
+          // Drag-and-drop: Aufgabe aufnehmen.
+          ziehen(event, aufgabe) {
+            this.gezogeneId = aufgabe.id;
+
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData(
+              "text/plain",
+              String(aufgabe.id)
+            );
+          },
+
+          // Drag-and-drop: Vorgang beenden.
+          ziehenBeenden() {
+            this.gezogeneId = null;
+            this.zielStatus = null;
+          },
+
+          // Drag-and-drop: Aufgabe ablegen.
+          async ablegen(status) {
+            const id = this.gezogeneId;
+            this.zielStatus = null;
+            this.gezogeneId = null;
+
+            const aufgabe = this.aufgaben.find(
+              (eintrag) => eintrag.id === id
+            );
+
+            if (!aufgabe || aufgabe.status === status) return;
+
+            await this.aktualisieren(aufgabe, {
+              status: status,
+            });
+          },
+
+          // DELETE: Aufgabe entfernen.
+          async loeschen(aufgabe) {
+            if (this.beschaeftigt) return;
+
+            this.beschaeftigt = true;
+
+            try {
+              const response = await fetch(
+                this.api + "/" + aufgabe.id,
+                { method: "DELETE" }
+              );
+
+              if (!response.ok) {
+                throw new Error("Löschen fehlgeschlagen");
+              }
+
+              this.aufgaben = this.aufgaben.filter(
+                (eintrag) => eintrag.id !== aufgabe.id
+              );
+
+              this.nachricht = "Aufgabe gelöscht.";
+            } catch (error) {
+              this.nachricht = "Aufgabe konnte nicht gelöscht werden.";
+              console.error(error);
+            } finally {
+              this.beschaeftigt = false;
+            }
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

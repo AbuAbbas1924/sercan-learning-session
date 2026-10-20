@@ -1,0 +1,21 @@
+
+[project]
+name = "app-3"
+version = "0.1.0"
+description = "Kanban-Board mit FastAPI, SQLModel, Alpine.js und Tailwind CSS"
+readme = "README.md"
+authors = [
+    { name = "Sercan", email = "sercan_yildirim@outlook.de" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "fastapi>=0.151.0",
+    "sqlalchemy[asyncio]>=2.1.5",
+    "sqlmodel>=0.0.48",
+    "uvicorn>=0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"

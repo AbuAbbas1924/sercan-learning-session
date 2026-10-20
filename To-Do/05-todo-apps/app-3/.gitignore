@@ -1,0 +1,9 @@
+# Lokale Python-Umgebung
+.venv/
+
+# Automatisch erzeugte Python-Dateien
+__pycache__/
+*.pyc
+
+# Lokale SQLite-Datenbanken
+*.db
