@@ -13,6 +13,10 @@ class Aufgabe(SQLModel, table=True):
     titel: str
     erledigt: bool = False
 
+# Beschreibt die Daten, die beim Erstellen gesendet werden.
+class AufgabeErstellen(SQLModel):
+    titel: str = Field(min_length=1)
+
 
 # Zugang zu unserer SQLite-Datenbank vorbereiten.
 async_engine = create_async_engine(
@@ -71,3 +75,22 @@ async def aufgaben_lesen(session: AsyncSession = Depends(get_session)):
 
     # Alle gefundenen Aufgaben zurückgeben.
     return ergebnis.all()
+
+@app.post("/aufgaben", status_code=201)
+async def aufgabe_erstellen(
+    daten: AufgabeErstellen,
+    session: AsyncSession = Depends(get_session),
+):
+    # Aus den empfangenen Daten eine neue Aufgabe erstellen.
+    neue_aufgabe = Aufgabe(titel=daten.titel)
+
+    # Die Aufgabe für das Speichern vormerken.
+    session.add(neue_aufgabe)
+
+    # Die Änderung dauerhaft in der Datenbank speichern.
+    await session.commit()
+
+    # Die von SQLite vergebene ID und die gespeicherten Werte laden.
+    await session.refresh(neue_aufgabe)
+
+    return neue_aufgabe
