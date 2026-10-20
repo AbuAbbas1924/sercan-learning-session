@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meine To-do-App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body class="bg-gray-100 p-8">
+    <main class="bg-white mx-auto p-6 rounded-lg max-w-lg">
+      <h1 class="mb-6 font-bold text-3xl">Meine To-do-App</h1>
+
+      <label for="aufgabe" class="block mb-2"> Neue Aufgabe: </label>
+
+      <input
+        id="aufgabe"
+        type="text"
+        placeholder="Was möchtest du erledigen?"
+        class="mb-4 p-2 border border-gray-300 rounded w-full"
+      />
+
+      <button
+        type="button"
+        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
+      >
+        Hinzufügen
+      </button>
+    </main>
+  </body>
+</html>

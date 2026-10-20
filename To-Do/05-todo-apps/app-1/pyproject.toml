@@ -1,0 +1,17 @@
+[project]
+name = "app-1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Sercan", email = "sercan_yildirim@outlook.de" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+app-1 = "app_1:main"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
