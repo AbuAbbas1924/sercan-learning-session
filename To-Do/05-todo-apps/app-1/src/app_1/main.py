@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel, Field, select
@@ -16,6 +16,10 @@ class Aufgabe(SQLModel, table=True):
 # Beschreibt die Daten, die beim Erstellen gesendet werden.
 class AufgabeErstellen(SQLModel):
     titel: str = Field(min_length=1)
+
+# Eingabedaten zum Ändern des Erledigt-Status.
+class AufgabeStatus(SQLModel):
+    erledigt: bool
 
 
 # Zugang zu unserer SQLite-Datenbank vorbereiten.
@@ -54,7 +58,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3000",
     ],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PATCH"],
     allow_headers=["Content-Type"],
 )
 
@@ -95,3 +99,25 @@ async def aufgabe_erstellen(
     await session.refresh(neue_aufgabe)
 
     return neue_aufgabe
+
+@app.patch("/aufgaben/{aufgabe_id}")
+async def aufgabe_status_aendern(
+    aufgabe_id: int,
+    daten: AufgabeStatus,
+    session: AsyncSession = Depends(get_session),
+):
+    # Die Aufgabe anhand ihrer ID suchen.
+    aufgabe = await session.get(Aufgabe, aufgabe_id)
+
+    if aufgabe is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Aufgabe nicht gefunden",
+        )
+
+    # Den übermittelten Status übernehmen und speichern.
+    aufgabe.erledigt = daten.erledigt
+    await session.commit()
+    await session.refresh(aufgabe)
+
+    return aufgabe

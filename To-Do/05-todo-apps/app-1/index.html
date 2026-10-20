@@ -37,7 +37,20 @@
       <!-- Zeigt alle hinzugefügten Aufgaben an. -->
       <ul class="mt-4">
         <template x-for="aufgabe in aufgaben" :key="aufgabe.id">
-          <li class="bg-gray-100 mb-2 p-2 rounded" x-text="aufgabe.titel"></li>
+          <li class="bg-gray-100 mb-2 p-2 rounded">
+            <label class="flex items-center gap-3">
+              <input
+                type="checkbox"
+                :checked="aufgabe.erledigt"
+                @change="statusAendern(aufgabe, $event)"
+              />
+
+              <span
+                x-text="aufgabe.titel"
+                :class="{ 'line-through text-gray-500': aufgabe.erledigt }"
+              ></span>
+            </label>
+          </li>
         </template>
       </ul>
     </main>
@@ -68,7 +81,43 @@
               console.error(error);
             }
           },
+          async statusAendern(aufgabe, event) {
+            const checkbox = event.target;
+            const neuerStatus = checkbox.checked;
 
+            // Weitere Klicks verhindern, solange gespeichert wird.
+            checkbox.disabled = true;
+
+            try {
+              const response = await fetch(
+                "http://127.0.0.1:8000/aufgaben/" + aufgabe.id,
+                {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    erledigt: neuerStatus,
+                  }),
+                },
+              );
+
+              if (!response.ok) {
+                throw new Error("Statusänderung fehlgeschlagen");
+              }
+
+              const gespeicherteAufgabe = await response.json();
+              aufgabe.erledigt = gespeicherteAufgabe.erledigt;
+              this.apiNachricht = "Status gespeichert.";
+            } catch (error) {
+              // Bei einem Fehler den bisherigen Haken wiederherstellen.
+              checkbox.checked = aufgabe.erledigt;
+              this.apiNachricht = "Der Status konnte nicht gespeichert werden.";
+              console.error(error);
+            } finally {
+              checkbox.disabled = false;
+            }
+          },
           async hinzufuegen() {
             const text = this.neueAufgabe.trim();
 
