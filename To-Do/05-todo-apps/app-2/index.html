@@ -181,13 +181,13 @@
 
           async laden() {
             try {
-              const response = await fetch(this.api);
+              // const response = await fetch(this.api);
 
-              if (!response.ok) {
-                throw new Error("Laden fehlgeschlagen");
-              }
+              // if (!response.ok) {
+              //   throw new Error("Laden fehlgeschlagen");
+              // }
 
-              this.aufgaben = await response.json();
+              this.aufgaben = await (await fetch(this.api)).json();
               this.nachricht = "Deine Aufgaben sind aktuell.";
             } catch (error) {
               this.nachricht = "Aufgaben konnten nicht geladen werden.";
