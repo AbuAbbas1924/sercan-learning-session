@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine
-from contextlib import 
+
+
+
+class Aufgabe(SQLModel):
+    titel: str
 
 async_engine = create_async_engine(
     "sqlite+aiosqlite:///./test.db",
@@ -25,3 +30,7 @@ app.add_middleware(
 @app.get('/')
 async def test():
     return {'hello' : 'world'}
+
+@app.post('/aufgaben')
+async def aufgabe_empfangen(aufgabe: Aufgabe):
+    return aufgabe
