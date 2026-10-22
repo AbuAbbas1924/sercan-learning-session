@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, select
 from sqlalchemy.ext.asyncio import create_async_engine
 from contextlib import asynccontextmanager
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -67,3 +67,11 @@ async def aufgabe_empfangen(
     await session.commit()
     await session.refresh(neue_aufgabe)
     return neue_aufgabe
+
+@app.get('/aufgaben')
+async def aufgaben_lesen(
+    session: SessionDependency
+):
+    abfrage = select(AufgabeDB)
+    ergebnis = await session.exec(abfrage)
+    return ergebnis.all()

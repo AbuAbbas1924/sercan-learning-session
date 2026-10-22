@@ -50,7 +50,10 @@
         return {
           endpoint: "http://127.0.0.1:8000",
           neueAufgabe: "",
-          aufgaben: "Hier sollten die Aufgaben erscheinen",
+          aufgaben: [],
+          async init() {
+            await this.laden();
+          },
 
           async hinzufuegen() {
             const aufgabe = await fetch("http://127.0.0.1:8000/aufgaben", {
@@ -64,7 +67,13 @@
                 titel: this.neueAufgabe,
               }),
             });
-            this.aufgaben = await aufgabe.json();
+            // hier nicht ganz gecheckt was abgeht
+            await this.laden();
+            this.neueAufgabe = "";
+          },
+          async laden() {
+            const getAufgabe = await fetch("http://127.0.0.1:8000/aufgaben");
+            this.aufgaben = await getAufgabe.json();
           },
         };
       }
