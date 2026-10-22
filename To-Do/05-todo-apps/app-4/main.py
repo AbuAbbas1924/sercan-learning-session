@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel, Field
 from sqlalchemy.ext.asyncio import create_async_engine
 from contextlib import asynccontextmanager
+from sqlmodel.ext.asyncio.session import AsyncSession
+from typing import Annotated
+
 
 
 
@@ -21,9 +24,17 @@ async_engine = create_async_engine(
     echo=True,
 )
 
+
 async def async_init_db():
     async with async_engine.begin() as connection:
         await connection.run_sync(SQLModel.metadata.create_all)
+
+async def get_session():
+    async with AsyncSession(async_engine) as session:
+        yield session
+
+SessionDependency = Annotated[AsyncSession, Depends(get_session)]
+        
 
 @asynccontextmanager
 async def async_lifespan(app: FastAPI):
@@ -47,5 +58,12 @@ async def test():
     return {'hello' : 'world'}
 
 @app.post('/aufgaben')
-async def aufgabe_empfangen(aufgabe: Aufgabe):
-    return aufgabe
+async def aufgabe_empfangen(
+    aufgabe: Aufgabe,
+    session: SessionDependency,
+    ):
+    neue_aufgabe = AufgabeDB(titel=aufgabe.titel)
+    session.add(neue_aufgabe)
+    await session.commit()
+    await session.refresh(neue_aufgabe)
+    return neue_aufgabe
