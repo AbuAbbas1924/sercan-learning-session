@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-do by FiSi-Schmarotzer</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-slate-400 p-10">
+
+<header 
+class="bg-[url('https://media.tenor.com/Qfuw6SNFaOYAAAAi/copy-paste.gif')] bg-auto bg-blue-200 bg-no-repeat bg-right p-24 border border-2 font-bold text-4xl text-center">
+<h1>FiSi-Schmarotzer baut To-do app</h1></header>
+
+
+    <main class="bg-sky-200 mx-auto mt-10 p-8 border-2 rounded-xl max-w-3xl">
+        <h2 class="mb-8 font-bold text-4xl text-center">
+            Meine Aufgaben
+        </h2>
+
+        <section class="mb-8">
+
+            <h3 class="mb-4 font-bold text-xl">
+                Neue Aufgabe hinzufügen
+            </h3>
+
+            <div class="flex gap-3">
+
+                <input
+                    type="text"
+                    placeholder="Neue Aufgabe eingeben ..."
+                    class="flex-1 bg-white p-3 border-2 border-slate-400 rounded-lg min-w-0"
+                    x-model="neueAufgabe"
+                >
+
+                <button
+                    type="button"
+                    class="bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-lg font-bold text-white cursor-pointer"
+                >
+                    Hinzufügen
+                </button>
+
+    </main>
+</body>
+
+<script>
+    function toDO() {
+        return {
+            endpoint: "http://127.0.0.1:8000",
+            neueAufgabe: "",
+
+
+            hinzufuegen() {
+
+            }
+        }
+    }
+</script>
+</html>
