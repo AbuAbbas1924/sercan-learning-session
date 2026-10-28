@@ -30,9 +30,10 @@
             url: 'http://127.0.0.1:8000/',
             apiData: null,
             async fetchData() {
-                const response = await fetch(this.url);
-                const data = await response.json();
-                this.apiData = data;
+                // const response = await fetch(this.url);
+                // const data = await response.json();
+                // this.apiData = data;
+                this.apiData = await (await fetch(this.url)).json()
                 // console.log(data);
             }
         }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <script
+        src="https://unpkg.com/alpinejs"
+        defer
+    ></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div x-data="myData()">
+        <div class="flex space-x-3 m-4">
+            <input
+                type="text"
+                x-model="inp1"
+                @keyup.enter="addTask()"
+                class="px-4 py-2 border-2 border-green-500 w-full"
+            >
+            <input
+                type="checkbox"
+                class="accent-purple-400"
+                x-model="inp2"
+            >
+            <button
+                @click="addTask()"
+                class="bg-green-300 hover:bg-green-500 px-4 py-2 rounded-xl text-white"
+            >add</button>
+        </div>
+        <hr class="border-2 border-green-400">
+        <div class="gap-3 grid grid-cols-3">
+            <template
+                x-for="i, j in tasks"
+                :key="i.id"
+            >
+                <div
+                    x-data="{editMode: false}"
+                    class="relative flex justify-center space-x-3 bg-blue-500 hover:bg-rose-400 m-4 p-4 rounded-xl text-white"
+                    :class="{'bg-gray-400 cursor-not-allowed': i.done, ' hover:bg-yellow-400' : editMode}"
+                    @dblclick="editMode=true"
+                    @click="i.done=!i.done"
+                >
+                    <span
+                        x-show="!editMode"
+                        x-text="`${i.id}. ${i.name} [${j}]`"
+                    ></span>
+                    <span
+                        x-show="!editMode"
+                        @click="tasks.splice(j, 1)"
+                        class="top-0 right-0 absolute font-bold text-black cursor-pointer"
+                    >X</span>
+                    <input
+                        x-show="editMode"
+                        type="text"
+                        x-model="i.name"
+                        @keyup.enter="editMode=false"
+                    >
+                </div>
+            </template>
+        </div>
+        <pre x-text="JSON.stringify(tasks, null, 2)"></pre>
+    </div>
+</body>
+<script>
+    function myData() {
+        return {
+            inp1: '',
+            inp2: false,
+            tasks: [],
+            addTask() {
+                this.tasks.push({ id: this.tasks.length + 1, name: this.inp1, done: this.inp2 });
+                this.inp1 = '';
+                this.inp2 = false;
+            }
+        }
+    }
+</script>
+
+</html>
