@@ -42,7 +42,11 @@
         </div>
       </section>
 
-      <pre x-text="JSON.stringify(aufgaben,null,2)"></pre>
+      <ul class="">
+        <template x-for="aufgabe in aufgaben" :key="aufgabe.id">
+          <li class="" x-text="aufgabe.titel"></li>
+        </template>
+      </ul>
     </main>
 
     <script>
@@ -56,24 +60,49 @@
           },
 
           async hinzufuegen() {
-            const aufgabe = await fetch("http://127.0.0.1:8000/aufgaben", {
-              method: "POST",
+            const text = this.neueAufgabe.trim();
+            if (text === "") {
+              return;
+            }
+            try {
+              const aufgabe = await fetch("http://127.0.0.1:8000/aufgaben", {
+                method: "POST",
 
-              headers: {
-                "Content-Type": "application/json",
-              },
+                headers: {
+                  "Content-Type": "application/json",
+                },
 
-              body: JSON.stringify({
-                titel: this.neueAufgabe,
-              }),
-            });
-            // hier nicht ganz gecheckt was abgeht
-            await this.laden();
-            this.neueAufgabe = "";
+                body: JSON.stringify({
+                  titel: text,
+                }),
+              });
+              if (!aufgabe.ok) {
+                alert("Aufgabe konnte nicht gespeichert werden.");
+                return;
+              }
+              // hier nicht ganz gecheckt was abgeht
+              await this.laden();
+              this.neueAufgabe = "";
+            } catch (error) {
+              alert("Beim Senden ist ein Verbindungsfehler aufgetreten.");
+              console.error(error);
+            }
           },
+
           async laden() {
-            const getAufgabe = await fetch("http://127.0.0.1:8000/aufgaben");
-            this.aufgaben = await getAufgabe.json();
+            try {
+              const getAufgabe = await fetch("http://127.0.0.1:8000/aufgaben");
+              if (!getAufgabe.ok) {
+                alert("Aufgaben konnten nicht geladen werden");
+                return;
+              }
+              this.aufgaben = await getAufgabe.json();
+            } catch (error) {
+              alert(
+                "Beim Laden ist ein Verbindungs- oder Verarbeitungsfehler aufgetreten.",
+              );
+              console.error(error);
+            }
           },
         };
       }
