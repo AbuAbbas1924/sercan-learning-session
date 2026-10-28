@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel, Field, select
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -62,7 +62,14 @@ async def aufgabe_empfangen(
     aufgabe: Aufgabe,
     session: SessionDependency,
     ):
-    neue_aufgabe = AufgabeDB(titel=aufgabe.titel)
+    # getrimmt, weil strip() Leerzeichen am Anfang und am Ende entfernt
+    getrimmter_titel = aufgabe.titel.strip() 
+    if getrimmter_titel == "":
+        raise HTTPException(
+            status_code=422,
+            detail="Der Titel darf nicht leer sein.",
+        )
+    neue_aufgabe = AufgabeDB(titel=getrimmter_titel)
     session.add(neue_aufgabe)
     await session.commit()
     await session.refresh(neue_aufgabe)
