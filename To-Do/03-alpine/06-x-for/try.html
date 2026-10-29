@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="bg-fuchsia-200">
+    <div x-data="tryData()">
+      <div class="flex space-x-3 m-4">
+        <input
+          type="text"
+          x-model="eingabe"
+          @keyup.enter="tryAufg()"
+          class="flex-1 border-4 border-fuchsia-500"
+        />
+        <button
+          class="bg-fuchsia-500 hover:bg-fuchsia-700 p-2 border-3 border-fuchsia-600"
+          @click="tryAufg()"
+        >
+          try
+        </button>
+      </div>
+      <hr class="border-2 border-purple-500" />
+
+      <div class="gap-4 grid grid-cols-4">
+        <template x-for="aufgabe, index in aufgaben" :key="aufgabe.id">
+          <div x-data="{bearbeiten: false}" @dblclick="bearbeiten: true">
+            <span
+              x-text="aufgabe.name"
+              class="block bg-purple-400 m-4 p-2 border-2 border-violet-500 rounded-xl min-w-0 text-center wrap-break-word"
+            ></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </body>
+  <script>
+    function tryData() {
+      return {
+        eingabe: "",
+        aufgaben: [],
+        tryAufg() {
+          this.aufgaben.push({
+            id: this.aufgaben.length + 1,
+            name: this.eingabe,
+          });
+          this.eingabe = "";
+        },
+      };
+    }
+  </script>
+</html>
