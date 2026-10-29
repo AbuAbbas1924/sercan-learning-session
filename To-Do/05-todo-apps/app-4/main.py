@@ -11,7 +11,8 @@ from typing import Annotated
 
 class Aufgabe(SQLModel):
     titel: str
-
+class AufgabeStatus(SQLModel):
+    completed: bool
 class AufgabeDB(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     titel: str
@@ -74,11 +75,30 @@ async def aufgabe_empfangen(
     await session.commit()
     await session.refresh(neue_aufgabe)
     return neue_aufgabe
+    
 
 @app.get('/aufgaben')
 async def aufgaben_lesen(
     session: SessionDependency
 ):
-    abfrage = select(AufgabeDB)
-    ergebnis = await session.exec(abfrage)
-    return ergebnis.all()
+    # abfrage = select(AufgabeDB)
+    # ergebnis = await session.exec(abfrage)
+    # return ergebnis.all()
+    return ( await session.exec( select(AufgabeDB))).all()
+
+@app.patch("/aufgaben/{aufgabe_id}")
+async def aufgabe_status_aendern(
+    aufgabe_id: int,
+    daten: AufgabeStatus,
+    session: SessionDependency,
+):
+    aufgabe = await session.get(AufgabeDB, aufgabe_id) 
+    if aufgabe is None:
+        raise HTTPException(
+        status_code=404,
+        detail="Aufgabe nicht gefunden",
+        )
+    aufgabe.completed = daten.completed
+    await session.commit()
+    await session.refresh(aufgabe)
+    return aufgabe

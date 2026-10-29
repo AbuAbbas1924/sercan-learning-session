@@ -44,7 +44,17 @@
 
       <ul class="">
         <template x-for="aufgabe in aufgaben" :key="aufgabe.id">
-          <li class="" x-text="aufgabe.titel"></li>
+          <li class="">
+            <label>
+              <input
+                class=""
+                type="checkbox"
+                :checked="aufgabe.completed"
+                @change="statusAendern(aufgabe, $event)"
+              />
+              <span x-text="aufgabe.titel" class=""></span>
+            </label>
+          </li>
         </template>
       </ul>
     </main>
@@ -65,18 +75,21 @@
               return;
             }
             try {
-              const aufgabe = await fetch("http://127.0.0.1:8000/aufgaben", {
-                method: "POST",
+              const antwortPost = await fetch(
+                "http://127.0.0.1:8000/aufgaben",
+                {
+                  method: "POST",
 
-                headers: {
-                  "Content-Type": "application/json",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+
+                  body: JSON.stringify({
+                    titel: text,
+                  }),
                 },
-
-                body: JSON.stringify({
-                  titel: text,
-                }),
-              });
-              if (!aufgabe.ok) {
+              );
+              if (!antwortPost.ok) {
                 alert("Aufgabe konnte nicht gespeichert werden.");
                 return;
               }
@@ -85,6 +98,36 @@
               this.neueAufgabe = "";
             } catch (error) {
               alert("Beim Senden ist ein Verbindungsfehler aufgetreten.");
+              console.error(error);
+            }
+          },
+          async statusAendern(aufgabe, event) {
+            const neuerStatus = event.target.checked;
+            try {
+              const antwortStatus = await fetch(
+                this.endpoint + "/aufgaben/" + aufgabe.id,
+                {
+                  method: "PATCH",
+
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+
+                  body: JSON.stringify({
+                    completed: neuerStatus,
+                  }),
+                },
+              );
+              if (!antwortStatus.ok) {
+                event.target.checked = aufgabe.completed;
+                alert("Der Status konnte nicht gespeichert werden.");
+                return;
+              }
+
+              aufgabe.completed = (await antwortStatus.json()).completed;
+            } catch (error) {
+              event.target.checked = aufgabe.completed;
+              alert("Verbindungs- oder Verarbeitungsfehler.");
               console.error(error);
             }
           },
