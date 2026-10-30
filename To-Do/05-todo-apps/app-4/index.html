@@ -42,21 +42,72 @@
         </div>
       </section>
 
-      <ul class="">
-        <template x-for="aufgabe in aufgaben" :key="aufgabe.id">
-          <li class="">
-            <label>
-              <input
-                class=""
-                type="checkbox"
-                :checked="aufgabe.completed"
-                @change="statusAendern(aufgabe, $event)"
-              />
-              <span x-text="aufgabe.titel" class=""></span>
-            </label>
-          </li>
-        </template>
-      </ul>
+      <div class="gap-6 grid grid-cols-1 md:grid-cols-2">
+        <!--Offene Aufgaben(Box)-->
+        <section class="bg-slate-100 p-4 rounded-xl">
+          <h3 class="mb-4 font-bold text-xl">
+            Offen (<span class="" x-text="offeneAufgaben.length"></span>)
+          </h3>
+          <p x-show="offeneAufgaben.length === 0" class="text-slate-500">
+            Keine offenen Aufgaben
+          </p>
+          <ul class="space-y-3">
+            <template x-for="aufgabe in offeneAufgaben" :key="aufgabe.id">
+              <li
+                class="bg-white shadow-sm p-4 border border-slate-300 rounded-lg"
+              >
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input
+                    class="w-5 h-5 accent-blue-600 shrink-0"
+                    type="checkbox"
+                    :checked="aufgabe.completed"
+                    @change="statusAendern(aufgabe, $event)"
+                  />
+                  <span
+                    x-text="aufgabe.titel"
+                    class="text-lg"
+                    :class="{ 'line-through text-slate-500': aufgabe.completed}"
+                  ></span>
+                </label>
+              </li>
+            </template>
+          </ul>
+        </section>
+
+        <!--Abgeschlossene Aufgaben(Box)-->
+        <section class="bg-slate-100 p-4 rounded-xl">
+          <h3 class="mb-4 font-bold text-xl">
+            Abgeschlossen (<span x-text="abgeschlosseneAufgaben.length"></span>)
+          </h3>
+          <p x-show="abgeschlosseneAufgaben.length === 0" class="text-slate-500">
+            Noch keine Aufgabe abgeschlossen
+          </p>
+          <ul class="space-y-3">
+            <template
+              x-for="aufgabe in abgeschlosseneAufgaben"
+              :key="aufgabe.id"
+            >
+              <li
+                class="bg-white shadow-sm p-4 border border-slate-300 rounded-lg"
+              >
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input
+                    class="w-5 h-5 accent-blue-600 shrink-0"
+                    type="checkbox"
+                    :checked="aufgabe.completed"
+                    @change="statusAendern(aufgabe, $event)"
+                  />
+                  <span
+                    x-text="aufgabe.titel"
+                    class="text-lg"
+                    :class="{ 'line-through text-slate-500': aufgabe.completed}"
+                  ></span>
+                </label>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </div>
     </main>
 
     <script>
@@ -65,6 +116,12 @@
           endpoint: "http://127.0.0.1:8000",
           neueAufgabe: "",
           aufgaben: [],
+          get offeneAufgaben() {
+            return this.aufgaben.filter((aufgabe) => !aufgabe.completed);
+          },
+          get abgeschlosseneAufgaben() {
+            return this.aufgaben.filter((aufgabe) => aufgabe.completed);
+          },
           async init() {
             await this.laden();
           },
