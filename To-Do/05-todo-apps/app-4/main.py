@@ -128,3 +128,18 @@ async def aufgabe_titel_aendern(
     await session.commit()
     await session.refresh(aufgabe)
     return aufgabe
+
+@app.delete("/aufgaben/{aufgabe_id}")
+async def aufgabe_loeschen(
+    aufgabe_id: int,
+    session: SessionDependency,
+):
+    aufgabe = await session.get(AufgabeDB, aufgabe_id)
+    if aufgabe is None: 
+        raise HTTPException(
+            status_code=404,
+            detail="Aufgabe nicht gefunden",
+        )
+    await session.delete(aufgabe)
+    await session.commit()
+    return {"nachricht": "Aufgabe gelöscht."}
