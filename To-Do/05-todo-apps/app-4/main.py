@@ -20,6 +20,9 @@ class AufgabeDB(SQLModel, table=True):
     completed: bool = False
     priority: int = 1
 
+class AufgabeTitel(SQLModel):
+    titel: str
+
 async_engine = create_async_engine(
     "sqlite+aiosqlite:///./mytodo.db",
     echo=True,
@@ -99,6 +102,29 @@ async def aufgabe_status_aendern(
         detail="Aufgabe nicht gefunden",
         )
     aufgabe.completed = daten.completed
+    await session.commit()
+    await session.refresh(aufgabe)
+    return aufgabe
+
+@app.patch("/aufgaben/{aufgabe_id}/titel")
+async def aufgabe_titel_aendern(
+    aufgabe_id: int,
+    daten: AufgabeTitel,
+    session: SessionDependency,
+):
+    aufgabe = await session.get(AufgabeDB, aufgabe_id) 
+    if aufgabe is None:
+        raise HTTPException(
+        status_code=404,
+        detail="Aufgabe nicht gefunden",
+        )
+    getrimmter_titel = daten.titel.strip()
+    if getrimmter_titel == "":
+        raise HTTPException(
+            status_code=422,
+            detail="Der Titel darf nicht leer sein.",
+        )
+    aufgabe.titel = getrimmter_titel 
     await session.commit()
     await session.refresh(aufgabe)
     return aufgabe

@@ -43,7 +43,6 @@
       </section>
 
       <div class="gap-6 grid grid-cols-1 md:grid-cols-2">
-        <!--Offene Aufgaben(Box)-->
         <section class="bg-slate-100 p-4 rounded-xl">
           <h3 class="mb-4 font-bold text-xl">
             Offen (<span class="" x-text="offeneAufgaben.length"></span>)
@@ -55,8 +54,12 @@
             <template x-for="aufgabe in offeneAufgaben" :key="aufgabe.id">
               <li
                 class="bg-white shadow-sm p-4 border border-slate-300 rounded-lg"
+                x-data="{bearbeiten: false, neuerTitel: ''}"
               >
-                <label class="flex items-center gap-3 cursor-pointer">
+                <label
+                  x-show="!bearbeiten"
+                  class="flex items-center gap-3 cursor-pointer"
+                >
                   <input
                     class="w-5 h-5 accent-blue-600 shrink-0"
                     type="checkbox"
@@ -69,17 +72,50 @@
                     :class="{ 'line-through text-slate-500': aufgabe.completed}"
                   ></span>
                 </label>
+                <button
+                  type="button"
+                  x-show="!bearbeiten"
+                  class="hover:bg-slate-100 p-1 border rounded text-xs cursor-pointer"
+                  @click="neuerTitel = aufgabe.titel; bearbeiten = true"
+                >
+                  Bearbeiten
+                </button>
+                <div x-show="bearbeiten">
+                  <input
+                    type="text"
+                    x-model="neuerTitel"
+                    class="p-2 border rounded"
+                  />
+                  <button
+                    type="button"
+                    @click="bearbeiten = false"
+                    class="hover:bg-slate-100 p-1 border rounded text-xs cursor-pointer"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    type="button"
+                    class="hover:bg-slate-100 p-1 border rounded text-xs cursor-pointer"
+                    @click=" if ( await titelAendern(aufgabe, neuerTitel)) {
+                      bearbeiten = false
+                    }"
+                  >
+                    Speichern
+                  </button>
+                </div>
               </li>
             </template>
           </ul>
         </section>
 
-        <!--Abgeschlossene Aufgaben(Box)-->
         <section class="bg-slate-100 p-4 rounded-xl">
           <h3 class="mb-4 font-bold text-xl">
             Abgeschlossen (<span x-text="abgeschlosseneAufgaben.length"></span>)
           </h3>
-          <p x-show="abgeschlosseneAufgaben.length === 0" class="text-slate-500">
+          <p
+            x-show="abgeschlosseneAufgaben.length === 0"
+            class="text-slate-500"
+          >
             Noch keine Aufgabe abgeschlossen
           </p>
           <ul class="space-y-3">
@@ -89,8 +125,12 @@
             >
               <li
                 class="bg-white shadow-sm p-4 border border-slate-300 rounded-lg"
+                x-data="{bearbeiten: false, neuerTitel: ''}"
               >
-                <label class="flex items-center gap-3 cursor-pointer">
+                <label
+                  x-show="!bearbeiten"
+                  class="flex items-center gap-3 cursor-pointer"
+                >
                   <input
                     class="w-5 h-5 accent-blue-600 shrink-0"
                     type="checkbox"
@@ -103,6 +143,37 @@
                     :class="{ 'line-through text-slate-500': aufgabe.completed}"
                   ></span>
                 </label>
+                <button
+                  type="button"
+                  class="hover:bg-slate-100 p-1 border rounded text-xs cursor-pointer"
+                  @click="neuerTitel = aufgabe.titel; bearbeiten = true"
+                  x-show="!bearbeiten"
+                >
+                  Bearbeiten
+                </button>
+                <div x-show="bearbeiten">
+                  <input
+                    type="text"
+                    class="p-2 border rounded"
+                    x-model="neuerTitel"
+                  />
+                  <button
+                    type="button"
+                    class="hover:bg-slate-100 p-1 border rounded text-xs cursor-pointer"
+                    @click="bearbeiten = false"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    type="button"
+                    class="hover:bg-slate-100 p-1 border rounded text-xs cursor-pointer"
+                    @click=" if ( await titelAendern(aufgabe, neuerTitel)) {
+                      bearbeiten = false
+                    }"
+                  >
+                    Speichern
+                  </button>
+                </div>
               </li>
             </template>
           </ul>
@@ -186,6 +257,41 @@
               event.target.checked = aufgabe.completed;
               alert("Verbindungs- oder Verarbeitungsfehler.");
               console.error(error);
+            }
+          },
+
+          async titelAendern(aufgabe, neuerTitel) {
+            const text = neuerTitel.trim();
+            if (text === "") {
+              alert("Titel darf nicht leer sein");
+              return false;
+            }
+            try {
+              const antwortNeuerTitel = await fetch(
+                this.endpoint + "/aufgaben/" + aufgabe.id + "/titel",
+                {
+                  method: "PATCH",
+
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+
+                  body: JSON.stringify({
+                    titel: text,
+                  }),
+                },
+              );
+              if (!antwortNeuerTitel.ok) {
+                alert("Der Titel konnte nicht gespeichert werden.");
+                return false;
+              }
+
+              aufgabe.titel = (await antwortNeuerTitel.json()).titel;
+              return true;
+            } catch (error) {
+              alert("Verbindungs- oder Verarbeitungsfehler.");
+              console.error(error);
+              return false;
             }
           },
 
