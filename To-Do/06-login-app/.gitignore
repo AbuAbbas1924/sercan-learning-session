@@ -1,0 +1,9 @@
+# Zugangsdaten
+.env
+
+# Lokale Python-Umgebung
+.venv/
+
+# Automatisch erzeugte Python-Dateien
+__pycache__/
+*.pyc
