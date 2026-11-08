@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from typing import Annotated
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, select
 from fastapi import Depends, FastAPI
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -29,7 +29,11 @@ if not database_url:
 
 
 # Engine für den asynchronen Zugriff auf PostgreSQL erstellen.
-async_engine = create_async_engine(database_url, echo=True)
+async_engine = create_async_engine(
+    database_url, 
+    echo=True,
+    hide_parameters=True,
+)
 
 # Für jede Anfrage, die diese Dependency verwendet,
 # eine eigene Datenbank-Session bereitstellen.
@@ -81,6 +85,39 @@ def passwort_pruefen(passwort: str, gespeicherter_hash: str) -> bool:
 async def async_init_db():
     async with async_engine.begin() as connection:
         await connection.run_sync(SQLModel.metadata.create_all)
+        await testbenutzer_erstellen()
+
+
+async def testbenutzer_erstellen():
+    # Zugangsdaten aus der .env auslesen.
+    benutzername = os.getenv("TEST_BENUTZERNAME")
+    passwort = os.getenv("TEST_PASSWORT")
+
+    # Ohne Test-Zugangsdaten keinen Benutzer anlegen.
+    if not benutzername or not passwort:
+        return
+
+    async with AsyncSession(async_engine) as session:
+        # Prüfen, ob dieser Benutzer bereits existiert.
+        abfrage = select(Benutzer).where(
+            Benutzer.benutzername == benutzername
+        )
+        ergebnis = await session.exec(abfrage)
+        vorhandener_benutzer = ergebnis.first()
+
+        if vorhandener_benutzer is not None:
+            return
+
+        # Nur den Hash in der Datenbank speichern.
+        neuer_benutzer = Benutzer(
+            benutzername=benutzername,
+            passwort_hash=passwort_hashen(passwort),
+        )
+
+        session.add(neuer_benutzer)
+        await session.commit()
+
+        print(">>> Testbenutzer wurde erstellt <<<")
 
 
 # Steuert, was beim Starten und Beenden der Anwendung passiert.
@@ -88,6 +125,7 @@ async def async_init_db():
 async def lifespan(app: FastAPI):
     # Beim Start: fehlende Tabellen erstellen.
     await async_init_db()
+    await testbenutzer_erstellen()
     print(">>> Datenbanktabellen sind bereit <<<")
 
     try:
