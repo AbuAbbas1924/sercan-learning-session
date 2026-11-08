@@ -1,3 +1,5 @@
+import jwt
+from datetime import datetime, timedelta, timezone
 import os
 from sqlalchemy import text
 from pathlib import Path
@@ -6,7 +8,7 @@ from dotenv import load_dotenv
 
 from typing import Annotated
 from sqlmodel import Field, SQLModel, select
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from contextlib import asynccontextmanager
@@ -27,6 +29,12 @@ database_url = os.getenv("DATABASE_URL")
 if not database_url:
     raise RuntimeError("DATABASE_URL fehlt. Prüfe deine .env-Datei.")
 
+jwt_secret = os.getenv("JWT_SECRET")
+if not jwt_secret:
+    raise RuntimeError("JWT_SECRET fehlt. Prüfe deine .env-Datei.")
+
+JWT_ALGORITHMUS = "HS256"
+JWT_DAUER_MINUTEN = 30
 
 # Engine für den asynchronen Zugriff auf PostgreSQL erstellen.
 async_engine = create_async_engine(
@@ -81,11 +89,20 @@ def passwort_hashen(passwort: str) -> str:
 def passwort_pruefen(passwort: str, gespeicherter_hash: str) -> bool:
     return passwort_hasher.verify(passwort, gespeicherter_hash)
 
+def jwt_erstellen(benutzer_id: int) -> str:
+    ablaufzeit = datetime.now(timezone.utc) + timedelta(minutes=JWT_DAUER_MINUTEN)
+
+    inhalt = {
+        "sub": str(benutzer_id),
+        "exp": ablaufzeit,
+    }
+
+    return jwt.encode(inhalt, jwt_secret, algorithm=JWT_ALGORITHMUS)
+
 # Die im Code beschriebenen Tabellen in der Datenbank erstellen.
 async def async_init_db():
     async with async_engine.begin() as connection:
         await connection.run_sync(SQLModel.metadata.create_all)
-        await testbenutzer_erstellen()
 
 
 async def testbenutzer_erstellen():
@@ -152,7 +169,7 @@ async def datenbank_test(session: SessionDependency):
     return {"datenbank": "verbunden", "ergebnis": wert}
 
 @app.post("/login", response_model=BenutzerAntwort)
-async def login(daten: BenutzerLogin, session: SessionDependency):
+async def login(daten: BenutzerLogin, session: SessionDependency, response: Response):
     # Benutzer anhand des eingegebenen Namens in PostgreSQL suchen.
     abfrage = select(Benutzer).where(Benutzer.benutzername == daten.benutzername)
     ergebnis = await session.exec(abfrage)
@@ -162,4 +179,17 @@ async def login(daten: BenutzerLogin, session: SessionDependency):
     if benutzer is None or not passwort_pruefen(daten.passwort, benutzer.passwort_hash):
         raise HTTPException(status_code=401, detail="Benutzername oder Passwort falsch")
 
+    token = jwt_erstellen(benutzer.id)
+
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=False,  # Für den lokalen Test über HTTP. Bei HTTPS: True.
+        max_age=JWT_DAUER_MINUTEN * 60,
+        path="/",
+    )
+
     return benutzer
+    
