@@ -278,13 +278,63 @@ async def login_seite():
     <html lang="de">
       <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Anmeldung</title>
       </head>
       <body>
         <main>
           <h1>Anmeldung</h1>
-          <p>Bitte melde dich an, um dein Dashboard zu öffnen.</p>
+
+          <form id="login-formular" method="post" action="/login">
+            <p>
+              <label for="benutzername">Benutzername</label><br>
+              <input id="benutzername" name="benutzername"
+                     type="text" autocomplete="username" required>
+            </p>
+
+            <p>
+              <label for="passwort">Passwort</label><br>
+              <input id="passwort" name="passwort"
+                     type="password" autocomplete="current-password" required>
+            </p>
+
+            <button type="submit">Anmelden</button>
+            <p id="meldung" role="alert"></p>
+          </form>
         </main>
+
+        <script>
+          const formular = document.getElementById("login-formular");
+          const meldung = document.getElementById("meldung");
+
+          formular.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            meldung.textContent = "";
+
+            const daten = {
+              benutzername: document.getElementById("benutzername").value,
+              passwort: document.getElementById("passwort").value
+            };
+
+            try {
+              const antwort = await fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(daten)
+              });
+
+              if (antwort.ok) {
+                window.location.assign("/dashboard");
+              } else if (antwort.status === 401) {
+                meldung.textContent = "Benutzername oder Passwort falsch.";
+              } else {
+                meldung.textContent = "Anmeldung fehlgeschlagen. Versuche es erneut.";
+              }
+            } catch {
+              meldung.textContent = "Der Server ist gerade nicht erreichbar.";
+            }
+          });
+        </script>
       </body>
     </html>
     """
