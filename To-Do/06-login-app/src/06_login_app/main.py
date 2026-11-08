@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from typing import Annotated
 from sqlmodel import Field, SQLModel, select
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from contextlib import asynccontextmanager
@@ -98,6 +98,43 @@ def jwt_erstellen(benutzer_id: int) -> str:
     }
 
     return jwt.encode(inhalt, jwt_secret, algorithm=JWT_ALGORITHMUS)
+
+async def get_current_user(
+    session: SessionDependency,
+    access_token: Annotated[str | None, Cookie()] = None,
+) -> Benutzer:
+    # FastAPI liest das Cookie mit dem Namen "access_token".
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Anmeldung erforderlich")
+
+    try:
+        # Signatur und Ablaufzeit prüfen.
+        inhalt = jwt.decode(
+            access_token,
+            jwt_secret,
+            algorithms=[JWT_ALGORITHMUS],
+            options={"require": ["sub", "exp"]},
+        )
+
+        # Beim Erstellen des Tokens haben wir die ID als Text gespeichert.
+        benutzer_id = int(inhalt["sub"])
+
+    except (jwt.InvalidTokenError, ValueError):
+        raise HTTPException(
+            status_code=401,
+            detail="Anmeldung ungültig oder abgelaufen",
+        )
+
+    # Den Benutzer über seinen Primärschlüssel aus PostgreSQL laden.
+    benutzer = await session.get(Benutzer, benutzer_id)
+
+    if benutzer is None:
+        raise HTTPException(status_code=401, detail="Benutzer nicht gefunden")
+
+    return benutzer
+
+
+AngemeldeterBenutzer = Annotated[Benutzer, Depends(get_current_user)]
 
 # Die im Code beschriebenen Tabellen in der Datenbank erstellen.
 async def async_init_db():
@@ -191,5 +228,9 @@ async def login(daten: BenutzerLogin, session: SessionDependency, response: Resp
         path="/",
     )
 
+    return benutzer
+
+@app.get("/ich", response_model=BenutzerAntwort)
+async def mein_profil(benutzer: AngemeldeterBenutzer):
     return benutzer
     
