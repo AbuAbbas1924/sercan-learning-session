@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from typing import Annotated
 from sqlmodel import Field, SQLModel, select
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from contextlib import asynccontextmanager
@@ -150,3 +150,16 @@ async def datenbank_test(session: SessionDependency):
     wert = ergebnis.scalar_one()
 
     return {"datenbank": "verbunden", "ergebnis": wert}
+
+@app.post("/login", response_model=BenutzerAntwort)
+async def login(daten: BenutzerLogin, session: SessionDependency):
+    # Benutzer anhand des eingegebenen Namens in PostgreSQL suchen.
+    abfrage = select(Benutzer).where(Benutzer.benutzername == daten.benutzername)
+    ergebnis = await session.exec(abfrage)
+    benutzer = ergebnis.first()
+
+    # Bei unbekanntem Benutzer oder falschem Passwort den Login ablehnen.
+    if benutzer is None or not passwort_pruefen(daten.passwort, benutzer.passwort_hash):
+        raise HTTPException(status_code=401, detail="Benutzername oder Passwort falsch")
+
+    return benutzer
