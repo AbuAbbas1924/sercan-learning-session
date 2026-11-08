@@ -6,6 +6,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from html import escape
+from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Annotated
 from sqlmodel import Field, SQLModel, select
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
@@ -233,4 +235,56 @@ async def login(daten: BenutzerLogin, session: SessionDependency, response: Resp
 @app.get("/ich", response_model=BenutzerAntwort)
 async def mein_profil(benutzer: AngemeldeterBenutzer):
     return benutzer
-    
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(
+    session: SessionDependency,
+    access_token: Annotated[str | None, Cookie()] = None,
+):
+    try:
+        # Dieselbe JWT-Prüfung verwenden wie bei /ich.
+        benutzer = await get_current_user(session=session, access_token=access_token)
+    except HTTPException as fehler:
+        if fehler.status_code == 401:
+            return RedirectResponse(url="/login", status_code=303)
+        raise
+
+    # Den Benutzernamen als Text in die HTML-Seite einsetzen.
+    name = escape(benutzer.benutzername)
+
+    return HTMLResponse(
+        content=f"""
+        <!doctype html>
+        <html lang="de">
+          <head>
+            <meta charset="utf-8">
+            <title>Dashboard</title>
+          </head>
+          <body>
+            <main>
+              <h1>Dashboard</h1>
+              <p>Willkommen, {name}!</p>
+            </main>
+          </body>
+        </html>
+        """,
+        headers={"Cache-Control": "no-store"},
+    )
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_seite():
+    return """
+    <!doctype html>
+    <html lang="de">
+      <head>
+        <meta charset="utf-8">
+        <title>Anmeldung</title>
+      </head>
+      <body>
+        <main>
+          <h1>Anmeldung</h1>
+          <p>Bitte melde dich an, um dein Dashboard zu öffnen.</p>
+        </main>
+      </body>
+    </html>
+    """
