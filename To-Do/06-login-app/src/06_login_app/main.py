@@ -264,6 +264,9 @@ async def dashboard(
             <main>
               <h1>Dashboard</h1>
               <p>Willkommen, {name}!</p>
+              <form method="post" action="/logout">
+                <button type="submit">Abmelden</button>
+              </form>
             </main>
           </body>
         </html>
@@ -338,3 +341,13 @@ async def login_seite():
       </body>
     </html>
     """
+
+@app.post("/logout")
+async def logout():
+    # Nach dem POST soll der Browser die Login-Seite per GET öffnen.
+    antwort = RedirectResponse(url="/login", status_code=303)
+
+    # Name und Pfad entsprechen dem Cookie aus deinem Login-Endpoint.
+    antwort.delete_cookie(key="access_token", path="/")
+
+    return antwort
