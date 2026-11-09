@@ -1,24 +1,22 @@
-import jwt
-from datetime import datetime, timedelta, timezone
 import os
-from sqlalchemy import text
-from pathlib import Path
-
-from dotenv import load_dotenv
-
-from html import escape
-from fastapi.responses import HTMLResponse, RedirectResponse
-from typing import Annotated
-from sqlmodel import Field, SQLModel, select
-from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.ext.asyncio import create_async_engine
 from contextlib import asynccontextmanager
-from pwdlib import PasswordHash
+from datetime import UTC, datetime, timedelta
+from html import escape
+from pathlib import Path
+from typing import Annotated
 
+import jwt
+from dotenv import load_dotenv
+from fastapi import Cookie, Depends, FastAPI, HTTPException, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
+from pwdlib import PasswordHash
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import Field, SQLModel, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 # Projektordner ermitteln:
-# main.py → 06_login_app → src → 06-login-app
+# main.py â†’ 06_login_app â†’ src â†’ 06-login-app
 projektordner = Path(__file__).resolve().parents[2]
 
 # Einstellungen aus der .env im Projektordner laden.
@@ -27,25 +25,26 @@ load_dotenv(projektordner / ".env")
 # Die Datenbankadresse aus den Umgebungsvariablen auslesen.
 database_url = os.getenv("DATABASE_URL")
 
-# Ohne Datenbankadresse mit einer verständlichen Fehlermeldung abbrechen.
+# Ohne Datenbankadresse mit einer verstÃ¤ndlichen Fehlermeldung abbrechen.
 if not database_url:
-    raise RuntimeError("DATABASE_URL fehlt. Prüfe deine .env-Datei.")
+    raise RuntimeError("DATABASE_URL fehlt. PrÃ¼fe deine .env-Datei.")
 
+# Mit diesem geheimen SchlÃ¼ssel signiert und Ã¼berprÃ¼ft der Server seine Tokens.
 jwt_secret = os.getenv("JWT_SECRET")
 if not jwt_secret:
-    raise RuntimeError("JWT_SECRET fehlt. Prüfe deine .env-Datei.")
+    raise RuntimeError("JWT_SECRET fehlt. PrÃ¼fe deine .env-Datei.")
 
 JWT_ALGORITHMUS = "HS256"
 JWT_DAUER_MINUTEN = 30
 
-# Engine für den asynchronen Zugriff auf PostgreSQL erstellen.
+# Engine fÃ¼r den asynchronen Zugriff auf PostgreSQL erstellen.
 async_engine = create_async_engine(
-    database_url, 
+    database_url,
     echo=True,
     hide_parameters=True,
 )
 
-# Für jede Anfrage, die diese Dependency verwendet,
+# FÃ¼r jede Anfrage, die diese Dependency verwendet,
 # eine eigene Datenbank-Session bereitstellen.
 async def get_session():
     async with AsyncSession(async_engine) as session:
@@ -53,10 +52,11 @@ async def get_session():
     # Nach der Verwendung wird die Session automatisch geschlossen.
 
 
-# Wiederverwendbare Typangabe für unsere Endpoints.
+# Steht SessionDependency in einer Route, ruft FastAPI get_session() auf
+# und Ã¼bergibt der Route die dort bereitgestellte Datenbank-Session.
 SessionDependency = Annotated[AsyncSession, Depends(get_session)]
 
-# Beschreibt die Datenbanktabelle für unsere Webseitenbenutzer.
+# Beschreibt die Datenbanktabelle fÃ¼r unsere Webseitenbenutzer.
 class Benutzer(SQLModel, table=True):
     # Eindeutige ID, die beim Speichern automatisch vergeben wird.
     id: int | None = Field(default=None, primary_key=True)
@@ -64,7 +64,7 @@ class Benutzer(SQLModel, table=True):
     # Jeder Benutzername darf nur einmal vorkommen.
     benutzername: str = Field(unique=True, index=True)
 
-    # Hier speichern wir später den Passwort-Hash.
+    # Hier speichern wir spÃ¤ter den Passwort-Hash.
     passwort_hash: str
 
 # Welche Daten der Client bei der Anmeldung sendet.
@@ -73,12 +73,12 @@ class BenutzerLogin(SQLModel):
     passwort: str = Field(min_length=1)
 
 
-# Welche Benutzerdaten die API zurückgeben darf.
+# Welche Benutzerdaten die API zurÃ¼ckgeben darf.
 class BenutzerAntwort(SQLModel):
     id: int
     benutzername: str
 
-# Werkzeug zum Hashen und Prüfen von Passwörtern erstellen.
+# Werkzeug zum Hashen und PrÃ¼fen von PasswÃ¶rtern erstellen.
 passwort_hasher = PasswordHash.recommended()
 
 
@@ -87,13 +87,14 @@ def passwort_hashen(passwort: str) -> str:
     return passwort_hasher.hash(passwort)
 
 
-# Prüfen, ob das eingegebene Passwort zum gespeicherten Hash passt.
+# PrÃ¼fen, ob das eingegebene Passwort zum gespeicherten Hash passt.
 def passwort_pruefen(passwort: str, gespeicherter_hash: str) -> bool:
     return passwort_hasher.verify(passwort, gespeicherter_hash)
 
 def jwt_erstellen(benutzer_id: int) -> str:
-    ablaufzeit = datetime.now(timezone.utc) + timedelta(minutes=JWT_DAUER_MINUTEN)
+    ablaufzeit = datetime.now(UTC) + timedelta(minutes=JWT_DAUER_MINUTEN)
 
+   # sub enthÃ¤lt die Benutzer-ID. exp legt fest, bis wann der Token gÃ¼ltig ist.
     inhalt = {
         "sub": str(benutzer_id),
         "exp": ablaufzeit,
@@ -110,7 +111,7 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="Anmeldung erforderlich")
 
     try:
-        # Signatur und Ablaufzeit prüfen.
+        # Signatur und Ablaufzeit prÃ¼fen.
         inhalt = jwt.decode(
             access_token,
             jwt_secret,
@@ -124,10 +125,10 @@ async def get_current_user(
     except (jwt.InvalidTokenError, ValueError):
         raise HTTPException(
             status_code=401,
-            detail="Anmeldung ungültig oder abgelaufen",
+            detail="Anmeldung ungÃ¼ltig oder abgelaufen",
         )
 
-    # Den Benutzer über seinen Primärschlüssel aus PostgreSQL laden.
+    # Den Benutzer Ã¼ber seinen PrimÃ¤rschlÃ¼ssel aus PostgreSQL laden.
     benutzer = await session.get(Benutzer, benutzer_id)
 
     if benutzer is None:
@@ -136,6 +137,7 @@ async def get_current_user(
     return benutzer
 
 
+# Routen mit dieser Typangabe bekommen den Benutzer erst nach der JWT-PrÃ¼fung.
 AngemeldeterBenutzer = Annotated[Benutzer, Depends(get_current_user)]
 
 # Die im Code beschriebenen Tabellen in der Datenbank erstellen.
@@ -154,7 +156,7 @@ async def testbenutzer_erstellen():
         return
 
     async with AsyncSession(async_engine) as session:
-        # Prüfen, ob dieser Benutzer bereits existiert.
+        # PrÃ¼fen, ob dieser Benutzer bereits existiert.
         abfrage = select(Benutzer).where(
             Benutzer.benutzername == benutzername
         )
@@ -185,10 +187,10 @@ async def lifespan(app: FastAPI):
     print(">>> Datenbanktabellen sind bereit <<<")
 
     try:
-        # Ab hier läuft die Anwendung und verarbeitet Anfragen.
+        # Ab hier lÃ¤uft die Anwendung und verarbeitet Anfragen.
         yield
     finally:
-        # Beim Beenden: Verbindungspool der Engine schließen.
+        # Beim Beenden: Verbindungspool der Engine schlieÃŸen.
         await async_engine.dispose()
 
 # FastAPI-Anwendung erstellen.
@@ -196,11 +198,11 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def start():
-    return {"nachricht": "FastAPI läuft!"}
+    return {"nachricht": "FastAPI lÃ¤uft!"}
 
 @app.get("/db-test")
 async def datenbank_test(session: SessionDependency):
-    # Die Abfrage jetzt über die bereitgestellte Session ausführen.
+    # Die Abfrage jetzt Ã¼ber die bereitgestellte Session ausfÃ¼hren.
     ergebnis = await session.execute(text("SELECT 1"))
 
     wert = ergebnis.scalar_one()
@@ -220,12 +222,14 @@ async def login(daten: BenutzerLogin, session: SessionDependency, response: Resp
 
     token = jwt_erstellen(benutzer.id)
 
+    # Der Browser speichert den Token und sendet ihn bei spÃ¤teren Anfragen mit.
+    # HttpOnly verhindert, dass JavaScript den Cookie Ã¼ber document.cookie ausliest.
     response.set_cookie(
         key="access_token",
         value=token,
         httponly=True,
         samesite="lax",
-        secure=False,  # Für den lokalen Test über HTTP. Bei HTTPS: True.
+        secure=False,  # FÃ¼r den lokalen Test Ã¼ber HTTP. Bei HTTPS: True.
         max_age=JWT_DAUER_MINUTEN * 60,
         path="/",
     )
@@ -242,14 +246,14 @@ async def dashboard(
     access_token: Annotated[str | None, Cookie()] = None,
 ):
     try:
-        # Dieselbe JWT-Prüfung verwenden wie bei /ich.
+        # Dieselbe JWT-PrÃ¼fung verwenden wie bei /ich.
         benutzer = await get_current_user(session=session, access_token=access_token)
     except HTTPException as fehler:
         if fehler.status_code == 401:
             return RedirectResponse(url="/login", status_code=303)
         raise
 
-    # Den Benutzernamen als Text in die HTML-Seite einsetzen.
+    # escape wandelt z. B. < in &lt; um. So zeigt der Browser den Namen als Text an.
     name = escape(benutzer.benutzername)
 
     return HTMLResponse(
@@ -311,6 +315,7 @@ async def login_seite():
           const meldung = document.getElementById("meldung");
 
           formular.addEventListener("submit", async (event) => {
+            // Wir senden die Felder selbst als JSON, wie POST /login sie erwartet.
             event.preventDefault();
             meldung.textContent = "";
 
@@ -327,6 +332,7 @@ async def login_seite():
               });
 
               if (antwort.ok) {
+                // Beim Aufruf des Dashboards sendet der Browser das Login-Cookie mit.
                 window.location.assign("/dashboard");
               } else if (antwort.status === 401) {
                 meldung.textContent = "Benutzername oder Passwort falsch.";
@@ -344,10 +350,10 @@ async def login_seite():
 
 @app.post("/logout")
 async def logout():
-    # Nach dem POST soll der Browser die Login-Seite per GET öffnen.
+    # Nach dem POST soll der Browser die Login-Seite per GET Ã¶ffnen.
     antwort = RedirectResponse(url="/login", status_code=303)
 
-    # Name und Pfad entsprechen dem Cookie aus deinem Login-Endpoint.
+    # Die Antwort weist den Browser an, das beim Login gesetzte Cookie zu lÃ¶schen.
     antwort.delete_cookie(key="access_token", path="/")
 
     return antwort
