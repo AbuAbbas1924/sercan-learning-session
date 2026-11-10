@@ -31,6 +31,9 @@ if not database_url:
 
 # Mit diesem geheimen SchlÃ¼ssel signiert und Ã¼berprÃ¼ft der Server seine Tokens.
 jwt_secret = os.getenv("JWT_SECRET")
+print("--- KONTROLLE ---") 
+print(f"JWT-Schlüssel gesetzt: {bool(jwt_secret)}")
+print("-----------------")
 if not jwt_secret:
     raise RuntimeError("JWT_SECRET fehlt. PrÃ¼fe deine .env-Datei.")
 
