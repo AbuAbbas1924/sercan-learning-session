@@ -5,8 +5,8 @@ build_dev(){
 }
 
 run_dev(){
-    docker run --rm -p 8000:8000 \
-    -v "${PWD}:/app" \
+    MSYS_NO_PATHCONV=1 docker run --rm -p 8000:8000 \
+    -v "$(pwd -W):/app" \
     -e WATCHFILES_FORCE_POLLING=true \
     --name todo-be todo-be:dev
 }
