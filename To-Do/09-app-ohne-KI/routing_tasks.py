@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import text # wird nur fuer Test benoetigt
 from session import db_dep
 from models import Task
@@ -34,3 +34,13 @@ async def create_task(task: Task, session: db_dep):
 async def get_tasks(session: db_dep):
     tasks = await session.execute(select(Task))
     return tasks.scalars().all()
+
+# Read: einzelne Aufgabe anhand ihrer ID abrufen
+@router.get("/{task_id}", response_model=Task)
+async def get_task(task_id: int, session: db_dep):
+    task = await session.get(Task, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+
