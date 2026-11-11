@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from engine import init_db
 from fastapi import FastAPI
 from session import db_dep
+from routing_tasks import router
 
 
 print("---FastAPI started---") #Test
@@ -15,6 +16,7 @@ async def db_lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=db_lifespan)
+app.include_router(router) # router in main.py einbinden
 
 # Test beim Start
 @app.get('/')
