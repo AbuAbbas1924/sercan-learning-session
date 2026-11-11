@@ -61,3 +61,13 @@ async def update_task(task_id: int, updated_task: Task, session: db_dep):
     # Aktuellen Datenbankstand laden und zurueckgeben
     await session.refresh(task)
     return task
+
+# Delete: Aufgabe loeschen
+@router.delete("/{task_id}", status_code=204)
+async def delete_task(task_id: int, session: db_dep):
+    task = await session.get(Task, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    await session.delete(task)
+    await session.commit()
+    return
