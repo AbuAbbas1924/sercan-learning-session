@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from sqlalchemy import text
+from sqlalchemy import text # wird nur fuer Test benoetigt
 from session import db_dep
+from models import Task
 
 
 # router definieren / Erstellt und konfiguriert den Router für alle "/tasks"-Endpunkte
@@ -16,6 +17,16 @@ async def test_router():
 async def test_router_db(session: db_dep):
     result = await session.execute(text("SELECT 1"))
     return {"database_ok": result.scalar_one() == 1}
+
+# --- CRUD ---
+
+# Create: neue Aufgabe erstellen und speichern
+@router.post("/", response_model=Task, status_code=201)
+async def create_task(task: Task, session: db_dep):
+    session.add(task)
+    await session.commit()
+    await session.refresh(task)
+    return task
 
 
 
