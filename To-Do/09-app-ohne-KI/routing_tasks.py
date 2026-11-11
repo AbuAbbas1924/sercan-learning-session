@@ -43,4 +43,21 @@ async def get_task(task_id: int, session: db_dep):
         raise HTTPException(status_code=404, detail="Task not found")
     return task
 
-
+# Update: Aufgabe aendern
+@router.patch("/{task_id}", response_model=Task)
+async def update_task(task_id: int, updated_task: Task, session: db_dep):
+    # Vorhandene Aufgabe anhand ihrer ID suchen
+    task = await session.get(Task, task_id)
+    # Abbrechen, wenn die Aufgabe nicht existiert
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    # Neue Werte aus der PATCH-Request in die vorhandene Aufgabe ubernehmen
+    task.title = updated_task.title
+    task.priority = updated_task.priority
+    task.completed = updated_task.completed
+    # Aenderungen speichern
+    session.add(task)
+    await session.commit()
+    # Aktuellen Datenbankstand laden und zurueckgeben
+    await session.refresh(task)
+    return task
