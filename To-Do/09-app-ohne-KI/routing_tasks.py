@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from sqlalchemy import text # wird nur fuer Test benoetigt
 from session import db_dep
 from models import Task
+from sqlmodel import select
 
 
 # router definieren / Erstellt und konfiguriert den Router für alle "/tasks"-Endpunkte
@@ -28,5 +29,8 @@ async def create_task(task: Task, session: db_dep):
     await session.refresh(task)
     return task
 
-
-
+# Read: vorhandene Aufgaben abrufen
+@router.get("/")
+async def get_tasks(session: db_dep):
+    tasks = await session.execute(select(Task))
+    return tasks.scalars().all()
