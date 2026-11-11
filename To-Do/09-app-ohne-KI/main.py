@@ -18,6 +18,6 @@ app = FastAPI(lifespan=db_lifespan)
 # Test beim Start
 @app.get('/')
 def test():
-    return {"test": "ok"} 
+    return {"test": "Der Test hat funktioniert"} 
 
 
