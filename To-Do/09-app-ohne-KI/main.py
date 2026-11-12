@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 from engine import init_db
 from fastapi import FastAPI
 from session import db_dep
-from routing_tasks import router
+from sqlalchemy import text # Fuer Test
+from routing_tasks import router as tasks_router
 
 
 print("---FastAPI started---") #Test
@@ -16,16 +17,10 @@ async def db_lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=db_lifespan)
-app.include_router(router) # router in main.py einbinden
+app.include_router(tasks_router) # router in main.py einbinden
 
-# Test beim Start
-@app.get('/')
-def test_start():
-    return {"test": "Der Test hat funktioniert"} 
-
-# Test fuer Session
-@app.get('/test-session')
-async def test_session(db: db_dep):
-    return {"test": "Session wurde bereitgestellt"}
-
+@app.get("/test-db") # Sinvoller Test um Datenbankzugriff zu ueberpruefen
+async def test_db(session: db_dep):
+    result = await session.execute(text("SELECT 1"))
+    return {"database_ok": result.scalar_one() == 1} 
 

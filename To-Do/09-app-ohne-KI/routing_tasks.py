@@ -11,7 +11,7 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 # Test ohne Datenbankzugriff
 @router.get("/test-router")
 async def test_router():
-    return {"message": "Tasks-Router funktioniert"}
+    return {"message": "Unnoetig sein Vater"}
 
 # Test mit Datenbankzugriff
 @router.get("/test-router-db")
