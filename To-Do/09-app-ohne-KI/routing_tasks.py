@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-from sqlalchemy import text # wird nur fuer Test benoetigt
 from session import db_dep
 from models import Task
 from sqlmodel import select
@@ -8,16 +7,6 @@ from sqlmodel import select
 # router definieren / Erstellt und konfiguriert den Router für alle "/tasks"-Endpunkte
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
-# Test ohne Datenbankzugriff
-@router.get("/test-router")
-async def test_router():
-    return {"message": "Unnoetig sein Vater"}
-
-# Test mit Datenbankzugriff
-@router.get("/test-router-db")
-async def test_router_db(session: db_dep):
-    result = await session.execute(text("SELECT 1"))
-    return {"database_ok": result.scalar_one() == 1}
 
 # --- CRUD ---
 
