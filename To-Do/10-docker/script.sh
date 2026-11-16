@@ -10,7 +10,7 @@ network() {
 run_db(){
     network
     docker run -p 5432:5432 \
-    -d \
+    --rm \
     --network $NETWORK \
     -e POSTGRES_USER=testpg \
     -e POSTGRES_PASSWORD=testpg \
@@ -20,9 +20,7 @@ run_db(){
     echo "postgres has started"
 }
 
-build_base(){
-    docker build -f Dockerfile-semi --target base -t testdocker:base .
-}
+
 
 build_dev(){
     docker build -f Dockerfile-semi --target dev -t testdocker:dev .
