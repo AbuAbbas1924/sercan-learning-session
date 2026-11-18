@@ -1,8 +1,18 @@
-from engine import async_engine
+from contextlib import asynccontextmanager
+
+from engine import async_engine, init_db
 from fastapi import FastAPI
 from sqlalchemy import text
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Initializing database...")
+    await init_db()
+    yield
+    await async_engine.dispose()
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get('/')
 def test():
