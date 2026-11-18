@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NETWORK=todo-net
+NETWORK=my-login-net
 
 network() {
     docker network inspect "$NETWORK" >/dev/null 2>&1 ||
@@ -9,14 +9,16 @@ network() {
 
 run_db(){
     network || return
-    docker run -p 5432:5432 \
+    docker run \
     --rm \
     --network "$NETWORK" \
+    -p 5432:5432 \
     -e POSTGRES_USER=postgres \
     -e POSTGRES_PASSWORD=postgres \
     -e POSTGRES_DB=postgres-db \
     -v login-vol:/var/lib/postgresql \
-    --name my-postgres-container postgres:19rc1-alpine
+    --name my-postgres-container \
+    postgres:19rc1-alpine
 }
 
 build_dev(){
@@ -25,12 +27,13 @@ build_dev(){
 
 run_dev(){
     network || return
-    docker run --rm \
-    --name my-fastapi-login-container \
-    -p 8000:8000 \
+    docker run \
+    --rm \
     --network="$NETWORK" \
+    -p 8000:8000 \
     -v "$(pwd -W):/app" \
     -e WATCHFILES_FORCE_POLLING=true \
+    --name my-fastapi-login-container \
     login-app:dev
 }
 
