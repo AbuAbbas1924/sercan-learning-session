@@ -1,3 +1,4 @@
+import models # Lets SQLModel discover the tables before create_all()
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 
