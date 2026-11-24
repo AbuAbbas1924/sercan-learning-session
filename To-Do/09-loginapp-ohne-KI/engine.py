@@ -1,9 +1,10 @@
 import models # Lets SQLModel discover the tables before create_all()
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
+import os
 
 async_engine = create_async_engine(
-    "postgresql+asyncpg://postgres:postgres@my-postgres-container:5432/postgres-db",
+    os.environ["DATABASE_URL"],
     echo=True,
 )
 

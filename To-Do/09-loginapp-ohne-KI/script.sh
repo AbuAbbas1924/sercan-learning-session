@@ -9,13 +9,13 @@ network() {
 
 run_db(){
     network || return
+    # Optionally add -d to run the container in the background.
+    # --env-file .env supplies the database settings from .env.
     docker run \
     --rm \
     --network "$NETWORK" \
     -p 5432:5432 \
-    -e POSTGRES_USER=postgres \
-    -e POSTGRES_PASSWORD=postgres \
-    -e POSTGRES_DB=postgres-db \
+    --env-file .env \
     -v login-vol:/var/lib/postgresql \
     --name my-postgres-container \
     postgres:19rc1-alpine
@@ -29,6 +29,7 @@ run_dev(){
     network || return
     docker run \
     --rm \
+    --env-file .env \
     --network="$NETWORK" \
     -p 8000:8000 \
     -v "$(pwd -W):/app" \
