@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from engine import async_engine, init_db
@@ -29,3 +30,8 @@ async def test_db():
     except Exception as exc:
         print(exc) 
         return {"message": "Not connected"}
+
+# test/check env variables
+@app.get("/test-env")
+def test_env():
+    return {"env_test": os.getenv("ENV_TEST", "ENV_TEST is missing")}
