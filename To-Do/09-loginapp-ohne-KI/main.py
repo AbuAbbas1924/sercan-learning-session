@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from engine import async_engine, init_db
 from fastapi import FastAPI
+from routing_auth import router
 from session import db_dep
 from sqlalchemy import text
 
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
     await async_engine.dispose()
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(router)
 
 @app.get('/')
 def test():
